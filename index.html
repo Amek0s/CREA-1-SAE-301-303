@@ -5,65 +5,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Master</title>
+    <title>MasterMind - Ton master bien pensé !</title>
     <meta name="description" content="Trouvez le master de vos rêves avec MasterMind">
-    <link rel="shortcut icon" href="./images/logos/icone.svg" type="image/w-icon">
-    <link rel="stylesheet" href="./css/styles.css" type="text/css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Paytone+One&family=Readex+Pro:wght@160..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Paytone+One&family=Readex+Pro:wght@160..700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css" type="text/css">
-    <link rel="shortcut icon" href="./images/mascotte-chill.png" type="image/w-icon">
+    <link rel="icon" href="./images/mascotte-chill.png" type="image/w-icon">
 </head>
 
 <body>
     <header>
-        <p class="titre">Master</p>
-        <img src="./images/mascotte-chill.png" alt = "logo MasterMind">
-        <p class="titre">Mind</p>
+        <div class="logo-container">
+            <p class="titre">Master</p>
+            <img src="./images/mascotte-chill.png" alt="Mascotte MasterMind">
+            <p class="titre">Mind</p>
+        </div>
     </header>
 
     <main>
-        <h1>Master...</h1>
-        <h2>Economie, gestion</h2>
-        <h3>Université paris nanterre</h3>
-        <div class="bloc">
-            <div class="bloc-p">
-                <p>Capacité d'accueil</p>
-                <p><strong>76</strong></p>
-            </div>
-            <div class="bloc-p">
-                <p>Alternance</p>
-                <p><strong>Non</strong></p>
-            </div>
-            
-        </div>
-        <div>
-            <a href="https://monmaster.gouv.fr/" target="_blank">
-                <button>Lien du site web</button>
-            </a>  
-        </div>
+        <section class="details-master">
+            <h1>Master...</h1>
+            <h2>Economie, gestion</h2>
+            <h3>Université paris nanterre</h3>
+        </section>
+
+        <section class="bloc">
+            <h2>Informations clés</h2>
+            <dl>
+                <div class="bloc-p">
+                    <dt>Capacité d'accueil</dt>
+                    <dd><strong>76</strong></dd>
+                </div>
+                <div class="bloc-p">
+                    <dt>Alternance</dt>
+                    <dd><strong>Non</strong></dd>
+                </div>
+            </dl>
+        </section>
+
+        <section class="web-link">
+            <a href="https://monmaster.gouv.fr/" target="_blank" rel="noopener noreferrer" class="button">Lien du site
+                web</a>
+        </section>
+
         <h4>Quelques chiffres</h4>
         <div class="charts">
             <canvas id="ecartChart1" width="400" height="200"></canvas>
-            <canvas id="ecartChart2" width="400" height="200"></canvas> 
+            <canvas id="ecartChart2" width="400" height="200"></canvas>
         </div>
         <h4>Lieu de la formation</h4>
-        // CARTE
+        <!-- CARTE -->
         <p>adresse</p>
     </main>
     <script src="https://chart.js"></script>
     <footer>
-         <img src="./" alt = "logo MasterMind">
-         <div>
-            <a href="https://www.instagram.com"><img src="./" 
-                        alt="Instagram"></a>
-            <a href="https://www.facebook.com"><img src="./"
-                        alt="Facebook"></a>
-            <a href="https://www.linkedin.com"><img src="./"
-                        alt="Linkedin"></a>
-         </div>
+        <div class="footer-content">
+            <img src="./images/mascotte-chill.png" alt="Logo MasterMind en pied de page">
+
+            <nav aria-label="Liens réseaux sociaux">
+                <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
+                    <img src="./images/social/instagram.svg" alt="Instagram">
+                </a>
+                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
+                    <img src="./images/social/facebook.svg" alt="Facebook">
+                </a>
+                <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
+                    <img src="./images/social/linkedin.svg" alt="Linkedin">
+                </a>
+            </nav>
+        </div>
     </footer>
 </body>
-
-
