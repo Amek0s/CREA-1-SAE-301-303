@@ -1,7 +1,10 @@
+/*VARIANTES*/
 :root {
     --main-color: #E6136A;
     --font-primary: 'Readex Pro';
 }
+
+/*principales*/
 
 *{
     margin: 0;
@@ -12,24 +15,15 @@
 h1{
     color: #E6136A;
     font-family: 'Paytone One';
-}
-
-h2, h3, h4, p, dl{
-    font-family: 'Readex Pro';
-}
-
-
-
-h1{
     text-align: center;
+}
+
+h2, h3, h4, p, dl, a{
+    font-family: 'Readex Pro';
 }
 
 h2{
     font-size: 15px;
-}
-.key-info{
-    color: white;
-    padding: 0.5rem;
 }
 
 h3{
@@ -40,6 +34,18 @@ padding: 0.4rem;
 
 h4{
     color: #E6136A;
+}
+
+p{
+    margin: 0;
+}
+
+a{
+    background-color: #E6136A;
+    border-radius: 15px;
+    color: white;
+    padding: 0.5rem;
+    text-decoration: none;
 }
 
 img{
@@ -57,7 +63,6 @@ header img{
     margin: auto;
 }
 
-
 .bloc{
     display: flex;
     flex-direction: column;
@@ -66,6 +71,11 @@ header img{
     background-color: #E6136A;
     justify-content: center;
     padding: 1rem;
+}
+
+.key-info{
+    color: white;
+    padding: 0.5rem;
 }
 
 .bloc dl{
@@ -83,17 +93,30 @@ header img{
     text-align: center;
 }
 
-a{
-    background-color: #E6136A;
-    border-radius: 15px;
-    color: white;
-    padding: 0.5rem;
-    text-decoration: none;
-}
-
 main{
     text-align: center;
 }
-p{
-    margin: 0;
+
+.web-link{
+    margin-top: 1rem;
+}
+
+
+/*les petits symboles et logos*/
+.chapeau{
+    display: block;
+    position: absolute;
+    right: 0;
+    rotate: 30deg;
+    top: 15%;
+}
+
+.mascotte-droite{
+    display: block;
+    position: absolute;
+    display: block;
+    position: absolute;
+    bottom: 35%;
+    left: 10%;
+    rotate: 350deg;
 }
