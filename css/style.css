@@ -8,7 +8,7 @@ h1{
     font-family: 'Paytone One';
 }
 
-h2, h3, h4, p{
+h2, h3, h4, p, dl{
     font-family: 'Readex Pro';
 }
 
@@ -28,18 +28,25 @@ border-radius: 15px;
 padding: 0.4rem;
 }
 
+h4{
+    color: #E6136A;
+}
+
 img{
     width: 5rem;
 }
+
 header{
-    display: flex;
-    justify-content: center;
     border-bottom: solid #E6136A 2px;
     padding-bottom: 10px;
 }
-.titre{
-    font-family: 'Paytone One';
+
+header img{
+    width: 12rem;
+    display: block;
+    margin: auto;
 }
+
 
 .bloc{
     display: flex;
@@ -56,7 +63,7 @@ header{
     margin: 0;
 }
 
-button{
+a{
     background-color: #E6136A;
     border-radius: 15px;
     color: white;
