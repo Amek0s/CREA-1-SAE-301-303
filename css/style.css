@@ -3,6 +3,12 @@
     --font-primary: 'Readex Pro';
 }
 
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+    
 h1{
     color: #E6136A;
     font-family: 'Paytone One';
@@ -20,6 +26,10 @@ h1{
 
 h2{
     font-size: 15px;
+}
+.key-info{
+    color: white;
+    padding: 0.5rem;
 }
 
 h3{
@@ -50,17 +60,27 @@ header img{
 
 .bloc{
     display: flex;
-    flex-wrap: nowrap;
+    flex-direction: column;
+    border: 3px solid blue;
     gap: 3rem;
     background-color: #E6136A;
     justify-content: center;
     padding: 1rem;
 }
+
+.bloc dl{
+    display : flex; 
+    justify-content: center;
+    gap: 2rem;
+    margin: 0;
+}
+
 .bloc-p{
     background-color: white;
-    border-radius: 20px;
+    border-radius: 15px;
     padding: 0.5rem;
     margin: 0;
+    text-align: center;
 }
 
 a{
