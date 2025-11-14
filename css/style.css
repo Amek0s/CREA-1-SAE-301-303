@@ -6,64 +6,71 @@
 
 /*principales*/
 
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-    
-h1{
+
+h1 {
     color: #E6136A;
     font-family: 'Paytone One';
     text-align: center;
 }
 
-h2, h3, h4, p, dl, a{
+h2,
+h3,
+h4,
+p,
+dl,
+a {
     font-family: 'Readex Pro';
 }
 
-h2{
+h2 {
     font-size: 15px;
 }
 
-h3{
-border: solid #E6136A 4px;
-border-radius: 15px;
-padding: 0.4rem;
+h3 {
+    border: solid #E6136A 4px;
+    border-radius: 15px;
+    padding: 0.4rem;
 }
 
-h4{
+h4 {
     color: #E6136A;
 }
 
-p{
+p {
     margin: 0;
 }
 
-a{
+a {
     background-color: #E6136A;
     border-radius: 15px;
     color: white;
-    padding: 0.5rem;
+    padding: 1rem;
     text-decoration: none;
+    margin: 2rem;
+    display: inline-block;
 }
 
-img{
+img {
     width: 5rem;
 }
 
-header{
+header {
     border-bottom: solid #E6136A 2px;
     padding-bottom: 10px;
 }
 
-header img{
+header img {
     width: 12rem;
     display: block;
     margin: auto;
 }
 
-.bloc{
+.bloc {
     display: flex;
     flex-direction: column;
     border: 3px solid blue;
@@ -73,19 +80,19 @@ header img{
     padding: 1rem;
 }
 
-.key-info{
+.key-info {
     color: white;
     padding: 0.5rem;
 }
 
-.bloc dl{
-    display : flex; 
+.bloc dl {
+    display: flex;
     justify-content: center;
     gap: 2rem;
     margin: 0;
 }
 
-.bloc-p{
+.bloc-p {
     background-color: white;
     border-radius: 15px;
     padding: 0.5rem;
@@ -93,17 +100,29 @@ header img{
     text-align: center;
 }
 
-main{
+main {
     text-align: center;
 }
 
-.web-link{
-    margin-top: 1rem;
+.chiffres-section {
+    position: relative;
+    min-height: 500px;
+}
+.wave-bg {
+    /* Positionnement pour prendre toute la section */
+    position: absolute; 
+    top: 0;
+    width: 100%;
+    height: 100%; 
+    background-image: url('../images/wave.svg');
+    background-size: cover; /* Assurez-vous que l'image couvre bien la zone */
+    background-repeat: no-repeat;
+    background-position: bottom; 
+    z-index: -1; 
 }
 
-
 /*les petits symboles et logos*/
-.chapeau{
+.chapeau {
     display: block;
     position: absolute;
     right: 0;
@@ -111,12 +130,9 @@ main{
     top: 15%;
 }
 
-.mascotte-droite{
+.mascotte-droite {
     display: block;
     position: absolute;
-    display: block;
-    position: absolute;
-    bottom: 35%;
     left: 10%;
     rotate: 350deg;
 }
