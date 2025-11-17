@@ -13,11 +13,17 @@
         rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css" type="text/css">
     <link rel="icon" href="./images/mascotte-chill.png" type="image/w-icon">
+    
+
 </head>
 
 <body>
     <header>
         <img src="./images/logo-v2.svg" class="logo-header" alt="Mascotte MasterMind">
+        <button class="btn-menu">
+            <img src="./images/filtre.svg" alt="Ouvrir le filtre" class="icone-filtre">
+            <img src="./images/croix.svg" class="icone-croix" alt="Fermer les filtres">
+         </button>
     </header>
 
     <main>
@@ -64,6 +70,24 @@
             <!-- CARTE -->
             <p>adresse</p>
         </section>
+
+         
+        <div class="menu-list">
+            <h2 class="h2-filtre">Trouver le master qui me correspond</h2>
+            <!-- options de filtre ici -->
+            <li class="menu-item">
+                <p>Nom du master</p>
+            </li>
+            <li class="menu-item">
+                <p class="filtre-p">Nom du master</p>
+            </li>
+            <li class="menu-item">
+                <p>Nom du master</p>
+            </li>
+            <li class="menu-item">
+                <p>Nom du master</p>
+            </li>
+        </div>
     </main>
     <script src="https://chart.js"></script>
 
@@ -72,18 +96,18 @@
             <img src="./images/mascotte-chill.png" alt="Logo MasterMind en pied de page">
 
             <nav aria-label="Liens réseaux sociaux">
-                <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
+                <a class="liens" href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
                     <img src="./images/social/instagram.svg" alt="Instagram">
                 </a>
-                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
+                <a class="liens" href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
                     <img src="./images/social/facebook.svg" alt="Facebook">
                 </a>
-                <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
+                <a  class="liens"href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
                     <img src="./images/social/linkedin.svg" alt="Linkedin">
                 </a>
             </nav>
-
             
         </div>
     </footer>
+    <script src="./js/filtre.js"></script> 
 </body>
