@@ -127,6 +127,7 @@ main {
     position: absolute;
     background-image: url('../images/pinkWave.svg');
     background-repeat: no-repeat;
+    background-size: cover;
     z-index: -2;
 }
 
