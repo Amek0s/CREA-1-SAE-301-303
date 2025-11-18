@@ -74,12 +74,17 @@ img {
 header {
     border-bottom: solid #E6136A 2px;
     padding-bottom: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-items: center;
+    align-items: center;
 }
 
-header img {
+.logo-header{
     width: 12rem;
     display: block;
     margin: auto;
+    grid-area: 1/2/2/3;
 }
 
 .bloc {
@@ -152,10 +157,107 @@ main {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    gap: 2rem;
     align-items: center;
 }
 
 nav {
     display: flex;
 }
+
+
+.btn-menu img {
+    height: 2rem;
+    margin: auto;
+}
+
+.btn-menu {
+    appearance: none;
+    border: none;
+    background: transparent;
+    width: 2rem;
+    grid-area: 1/3/2/4;
+}
+
+
+.icone-croix {
+    display: none;
+    z-index: 100;
+}
+
+.btn-menu.open .icone-filtre {
+  display: none;
+}
+
+.btn-menu.open .icone-croix {
+  display: block;
+}
+
+.menu-list {
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+    transition: linear 200ms;
+    background: #F9A8BA;
+    border-radius: 1rem;
+    color: black;
+    
+  }
+  
+  .menu-item {
+    display: flex;
+    align-content: center;
+    gap: 10%;
+  }
+
+  .filtre-p{
+    background-color: #303B6A;
+    border-radius: 10px;
+  }
+  
+  .menu-list {
+    position: fixed;        
+    top: 0;
+    left: 0;
+    width: 100vw;           
+    height: 100vh;          
+    display: none;           
+    background: rgba(249, 168, 186, 0.95); 
+    z-index: 1000;         
+    overflow-y: auto;       
+    padding: 2rem;
+    clip-path: none;  
+    
+    
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+  }
+
+.menu-list.open {
+    display: block;    
+    opacity: 1;
+    transform: translateY(0);     
+}
+
+  
+  .menu-list.open {
+    display: block;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    transition: linear 200ms;
+    
+  }
+
+  .menu-link {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+  }
+  
+  .menu-link:hover {
+    color: #303B6A;
+  }
+  
+  .h2-filtre{
+    background-color: #E6136A;
+  }
