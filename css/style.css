@@ -235,8 +235,9 @@ nav {
     border: none;
     width: 2rem;
     cursor: pointer;
+    position: relative;
+    z-index: 1001;     
 }
-
 
 .icone-croix {
     display: none;
@@ -269,7 +270,7 @@ nav {
     gap: 10%;
 }
 
-.filtre-p {
+.active {
     background-color: #303B6A;
     border-radius: 10px;
 }
