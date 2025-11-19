@@ -13,7 +13,12 @@
         rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css" type="text/css">
     <link rel="icon" href="./images/mascotte-chill.png" type="image/w-icon">
-    
+
+    <script src="https://fastly.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <!--NORMALEMENT ON A PAS BESOIN DERELIER AVEC SCRIPT C'EST ORCHESTRATOR QUI GERE-->
+    <script src="./js/grapheEmploi.js" defer></script>
+    <script src="./js/grapheSalaire.js" defer></script>
+    <script src="./js/grapheAdmission.js" defer></script>
 
 </head>
 
@@ -23,7 +28,7 @@
         <button class="btn-menu">
             <img src="./images/filtre.svg" alt="Ouvrir le filtre" class="icone-filtre">
             <img src="./images/croix.svg" class="icone-croix" alt="Fermer les filtres">
-         </button>
+        </button>
     </header>
 
     <main>
@@ -36,7 +41,7 @@
             <img src="./images/chapeau.svg" class="chapeau" alt="">
             <h3 class="title-border">Université paris nanterre</h3>
             <div class="bloc">
-                <!--<h2 class="key-info">Informations clés</h2> -->
+                <h2 class="key-info">Informations clés</h2>
                 <dl>
                     <div class="bloc-p">
                         <dt>Capacité d'accueil</dt>
@@ -54,25 +59,49 @@
 
 
 
-        <section class="chiffres-section">
-            <div class="wave-bg">
-            </div>
+        <section class="section-stats" aria-labelledby="stats-title">
+            <div class="background-wave" aria-hidden="true"></div>
 
             <h4>QUELQUES CHIFFRES</h4>
-            <img src="./images/mascotte-droite.svg" class="mascotte-droite" alt="">
-            <p>Salaires moyens à la sortie</p>
-            <p>Les types d'emplois après le master</p>
-            <p>Taux d'admission, taux d'insertion, taux d'emploi</p>
-            <div class="charts">
-                <canvas id="ecartChart1" width="400" height="200"></canvas>
-                <canvas id="ecartChart2" width="400" height="200"></canvas>
-            </div>
+            <img src="./images/mascotte-droite.svg" class="stats-mascot" alt="" aria-hidden="true">
+            <figure class="stat-card">
+                <figcaption class="stat-content">
+                    <p>Salaires moyens à la sortie</p>
+                </figcaption>
+                <div class="stat-visual">
+                    <div id="ecartChart1" class="grapheSalaire chart-render" role="img"
+                        aria-label="Graphique des salaires"></div>
+                </div>
+            </figure>
+
+            <figure class="stat-card layout-inverse">
+                <div class="stat-visual">
+                    <div id="ecartChart3" class="grapheEmploi chart-render" role="img"
+                        aria-label="Graphique répartition emplois"></div>
+                </div>
+                <figcaption class="stat-content">
+                    <p>Les types d'emplois après le master</p>
+                </figcaption>
+            </figure>
+
+            <figure class="stat-card">
+                <figcaption class="stat-content">
+                    <p>Taux d'admission, taux d'insertion, taux d'emploi</p>
+                </figcaption>
+                <div class="stat-visual">
+                    <div id="ecartChart2" class="grapheAdmission chart-render" role="img"
+                        aria-label="Graphique des taux"></div>
+                </div>
+            </figure>
+        </section>
+
+        <section class="location-section">
             <h4>LIEU DE LA FORMATION</h4>
             <!-- CARTE -->
             <p>adresse</p>
         </section>
 
-         
+
         <div class="menu-list">
             <h2 class="h2-filtre">Trouver le master qui me correspond</h2>
             <!-- options de filtre ici -->
@@ -90,7 +119,6 @@
             </li>
         </div>
     </main>
-    <script src="https://chart.js"></script>
 
     <footer>
         <div class="footer-content">
@@ -103,7 +131,7 @@
                 <a class="liens" href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
                     <img src="./images/social/facebook.svg" alt="Facebook">
                 </a>
-                <a  class="liens"href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
+                <a class="liens" href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
                     <img src="./images/social/linkedin.svg" alt="Linkedin">
                 </a>
             </nav>
@@ -111,5 +139,5 @@
 
         </div>
     </footer>
-    <script src="./js/filtre.js"></script> 
+    <script src="./js/filtre.js"></script>
 </body>
