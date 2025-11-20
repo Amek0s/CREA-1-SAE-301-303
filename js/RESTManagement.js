@@ -27,24 +27,36 @@ export default function getLastAttemps(start=null) {
 
 // URL de l'API (à adapter selon si tu la lances en local ou si elle est en ligne)
 // Exemple local souvent utilisé : http://localhost:3000/api/stats
-const API_URL = 'https://la-lab4ce.univ-lemans.fr/masters-stats/'; // ATTENTION: Ceci est le lien du repo, tu dois mettre le lien du serveur API lancé (ex: http://localhost:8080)
+const API_URL = 'https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr-esr-mon_master/records';
 
 
 /**
  * Récupère les statistiques du Master
  * @returns {Promise} Promesse contenant les données JSON
- * @param {*} start
+ * @param {string} ifc Identifiant de formation 
  */
-export default function getMasterStats() {
-    return fetch(API_URL)
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error('Erreur HTTP : ' + response.status);
-            }
-            return response.json();
-        })
-        .catch((error) => {
-            console.error('Erreur lors de la récupération des stats:', error);
-            return null; // Retourne null en cas d'erreur pour gérer ça dans l'orchestrateur
-        });
+export async function getFormationByIfc(ifc) {
+    try {
+        // Utilisation de encodeURIComponent pour sécuriser l'injection de la variable
+        const encodedIfc = encodeURIComponent(`"${ifc}"`);
+        const url = `${API_URL}?where=ifc=${encodedIfc}&limit=1`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (!data.results || data.results.length === 0) {
+            return null;
+        }
+
+        return data.results[0];
+
+    } catch (error) {
+        console.error("Erreur dans getFormationByIfc:", error);
+        throw error;
+    }
 }

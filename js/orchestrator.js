@@ -41,13 +41,43 @@ function main() {
 main();
 */
 
-import getMasterStats from "./RESTManagement.js";
+import {getFormationByIfc} from "./RESTManagement.js";
 import { saveStatsToCache, loadStatsFromCache } from "./cacheManagement.js";
 
 // Import des gestionnaires de graphiques
 import { initGrapheSalaire, updateGrapheSalaire } from "./grapheSalaire.js";
 import { initGrapheEmploi, updateGrapheEmploi } from "./grapheEmploi.js"; // À créer selon le modèle ci-dessus
 import { initGrapheAdmission, updateGrapheAdmission } from "./grapheAdmission.js"; // À créer selon le modèle ci-dessus
+
+export async function getMasterInformations(ifc) {
+    try {
+        const data =await getFormationByIfc(ifc);
+        if (!data) {
+            console.warn("Aucune donnée trouvée pour l'IFC :", ifc);
+            return;
+        }
+
+        console.log("Données récupérées pour l'IFC", ifc, data);
+
+        // Afficher le nom de l'établissement
+        const nomEtab = data?.eta_nom || "Établissement inconnu";
+        const tagEtab = document.getElementById('nomEtab');
+        tagEtab.textContent = nomEtab;
+        // Afficher le nom du parcours  
+        const nomMaster = data?.disci_master || "Master inconnu";
+        const tagMaster = document.getElementById('disci_master');
+        tagMaster.textContent = "Master " + nomMaster;
+        // Afficher la capacité d'accueil
+        const capacite = data?.col || "Capacité inconnue";
+        const tagCapacite = document.getElementById('col');
+        tagCapacite.textContent = capacite;
+        // Afficher l'alternance
+        const alternance = data?.alternance ? "Oui" : "Non";
+        const tagAlternance = document.getElementById('alternance');
+        tagAlternance.textContent = alternance;
+    } catch (error) {
+    }
+}
 
 function initAllCharts() {
     initGrapheSalaire();
@@ -63,6 +93,9 @@ function updateAllCharts(data) {
 }
 
 async function main() {
+    const ifc = '1800799UZ1SW';
+    getMasterInformations(ifc);
+
     // 1. Initialiser les graphiques (vides)
     initAllCharts();
 
