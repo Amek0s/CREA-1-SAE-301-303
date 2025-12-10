@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <meta name="description" content="Trouvez un master en fonction de vos passions et compétences">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Paytone+One&family=Readex+Pro:wght@160..700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css" type="text/css">
+    <link rel="icon" href="./images/mascotte-chill.png" type="image/w-icon">
+
+    <script src="https://fastly.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <!--NORMALEMENT ON A PAS BESOIN DE RELIER AVEC SCRIPT C'EST ORCHESTRATOR QUI GERE-->
+   <!-- <script src="./js/grapheEmploi.js" defer></script>
+    <script src="./js/grapheSalaire.js" defer></script>
+    <script src="./js/grapheAdmission.js" defer></script> -->
+    <script type="module" src="./js/orchestrator.js"></script>
+
+</head>
+
