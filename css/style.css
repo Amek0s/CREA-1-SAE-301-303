@@ -321,3 +321,51 @@ nav {
     color: var(--bg-secondary);
     font-weight: 900;
 }
+
+
+
+/*DEUXIEME PAGE / DISCIPLINE*/
+
+.discipline-card {
+    display: grid;
+    /* Layout par défaut : Texte à gauche (area 'txt'), Graph à droite (area 'viz') */
+    grid-template-columns: 0.8fr 1.2fr;
+    grid-template-areas: "txt viz"; /* Si jamais je place le txt à gauche et viz à droite, je met le mot dan stat visual et stat content */
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+/* Variante : Inversion des zones */
+.discipline-card.layout-inverse {
+    grid-template-columns: 1.2fr 0.8fr;
+    grid-template-areas: "viz txt"; /* Et ici ça inverse car g mis pour le graphe du milieu une classe .layout-inverse en + */
+}
+
+/* Colonne Texte */
+.discipline-content {
+    grid-area: txt;
+    font-weight: bold;
+    font-size: 0.95rem;
+    text-align: center;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: -1;
+}
+
+.discipline-visual {
+    grid-area: viz;
+    border-radius: var(--border-radius-card);
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 5px;
+    height: 300px;
+    width: 100%;
+    overflow: hidden;
+    /* Empêche le canvas de déborder */
+}
+
+
