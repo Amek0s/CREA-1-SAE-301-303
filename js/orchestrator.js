@@ -1,82 +1,28 @@
-/* import { create, update } from "./heatmapViz.js";
-import getLastAttempts from "./RESTManagement.js";
-
-
-function setupAutomaticUpdate(initialAttempts) {
-    // Tableau contenant TOUTES les tentatives
-    let allAttempts = initialAttempts;
-    // Date de la dernière tentative
-    let lastAttemptDate = new Date (attempts[attempts.length - 1][0]);
-
-
-
-
-    setInterval(() => {
-        // Récup des tentatives nouvelles depuis lastAttemptDate
-    getLastAttempts(lastAttemptDate).then((newAttempts) => {
-        // Rajout des tentatives au tableau
-        allAttempts = allAttempts.concat(newAttempts);
-        console.log("All attempts: " + allAttempts.length);
-        // Mise à jour date de la dernière tentative
-        lastAttemptDate = new Date(allAttempts[allAttempts.length - 1][0]);
-        // Mise à jour du graph
-        update(attempts);
-    });
-    }, 2000);
-}
-
-
-function main() {
-    create();
-
-
-    getLastAttempts(new Date()).then((attempts) => {
-        console.log(attempts.length + " tentatives...")
-        update(attempts);
-        setupAutomaticUpdate(attempts);
-    });
-}
-
-
-main();
-*/
-
-import {getFormationByIfc} from "./RESTManagement.js";
+import { getFormationByIfc } from "./RESTManagement.js";
 import { saveStatsToCache, loadStatsFromCache } from "./cacheManagement.js";
 
 // Import des gestionnaires de graphiques
 import { initGrapheSalaire, updateGrapheSalaire } from "./grapheSalaire.js";
-import { initGrapheEmploi, updateGrapheEmploi } from "./grapheEmploi.js"; // À créer selon le modèle ci-dessus
-import { initGrapheAdmission, updateGrapheAdmission } from "./grapheAdmission.js"; // À créer selon le modèle ci-dessus
+import { initGrapheEmploi, updateGrapheEmploi } from "./grapheEmploi.js"; 
+import { initGrapheAdmission, updateGrapheAdmission } from "./grapheAdmission.js"; 
 
-export async function getMasterInformations(ifc) {
-    try {
-        const data =await getFormationByIfc(ifc);
-        if (!data) {
-            console.warn("Aucune donnée trouvée pour l'IFC :", ifc);
-            return;
-        }
+// Fonction pour mettre à jour les informations clés
+function updateKeyInformations(data) {
+    // Afficher le nom de l'établissement
+    const tagEtab = document.getElementById('nomEtab');
+    tagEtab.textContent = data?.eta_nom || "Établissement inconnu";
+    // Afficher le nom du parcours  
+    const tagMaster = document.getElementById('disci_master');
+    tagMaster.textContent = "Master " + (data?.disci_master || "Inconnu");
+    // Afficher la capacité d'accueil
+    const tagCapacite = document.getElementById('col');
+    tagCapacite.textContent = data?.col || "Capacité inconnue";
+    // Afficher l'alternance
+    const tagAlternance = document.getElementById('alternance');
+    tagAlternance.textContent = data?.alternance ? "Oui" : "Non";
 
-        console.log("Données récupérées pour l'IFC", ifc, data);
-
-        // Afficher le nom de l'établissement
-        const nomEtab = data?.eta_nom || "Établissement inconnu";
-        const tagEtab = document.getElementById('nomEtab');
-        tagEtab.textContent = nomEtab;
-        // Afficher le nom du parcours  
-        const nomMaster = data?.disci_master || "Master inconnu";
-        const tagMaster = document.getElementById('disci_master');
-        tagMaster.textContent = "Master " + nomMaster;
-        // Afficher la capacité d'accueil
-        const capacite = data?.col || "Capacité inconnue";
-        const tagCapacite = document.getElementById('col');
-        tagCapacite.textContent = capacite;
-        // Afficher l'alternance
-        const alternance = data?.alternance ? "Oui" : "Non";
-        const tagAlternance = document.getElementById('alternance');
-        tagAlternance.textContent = alternance;
-    } catch (error) {
-    }
+    const tagParcours = document.getElementById('parcours');
+    tagParcours.textContent = data?.parcours || "";
 }
 
 function initAllCharts() {
@@ -92,9 +38,10 @@ function updateAllCharts(data) {
     updateGrapheAdmission(data);
 }
 
+// NOTE: L'ancienne fonction getMasterInformations est redondante/corrigée dans la nouvelle fonction main ci-dessous.
+
 async function main() {
     const ifc = '1800799UZ1SW';
-    getMasterInformations(ifc);
 
     // 1. Initialiser les graphiques (vides)
     initAllCharts();
@@ -102,17 +49,28 @@ async function main() {
     // 2. Tenter de charger depuis le cache
     let data = loadStatsFromCache();
 
-    if (data) {
+    if (data && data.ifc === ifc) {
+        
         console.log("Données chargées depuis le cache");
+        updateKeyInformations(data); 
         updateAllCharts(data);
+
     } else {
         console.log("Pas de cache, appel API...");
-        // 3. Si pas de cache, on fetch
-        data = await getMasterStats();
+        
+        // 3. Si pas de cache, on fetch l'objet Master complet
+        try {
+            // L'appel direct à getFormationByIfc renvoie l'objet data complet
+            data = await getFormationByIfc(ifc);
+        } catch (error) {
+            console.error("Erreur lors de la récupération des données Master:", error);
+            return;
+        }
         
         if (data) {
             // 4. On sauvegarde et on met à jour
             saveStatsToCache(data);
+            updateKeyInformations(data);
             updateAllCharts(data);
         } else {
             console.error("Impossible de récupérer les données.");

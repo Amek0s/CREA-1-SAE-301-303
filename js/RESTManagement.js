@@ -27,8 +27,9 @@ export default function getLastAttemps(start=null) {
 
 // URL de l'API (à adapter selon si tu la lances en local ou si elle est en ligne)
 // Exemple local souvent utilisé : http://localhost:3000/api/stats
-const API_URL = 'https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr-esr-mon_master/records';
-
+//const API_URL = 'https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr-esr-mon_master/records';
+const API_URL = 'https://la-lab4ce.univ-lemans.fr/masters-stats/api/rest/academies';
+https://la-lab4ce.univ-lemans.fr/masters-stats/api/rest/etablissements
 
 /**
  * Récupère les statistiques du Master
