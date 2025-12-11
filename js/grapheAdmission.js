@@ -102,10 +102,10 @@ export function updateGrapheAdmission(data) {
     const newData = [
         // Taux d'acceptation du master (en pourcentage)
         { value: data.pct_accept_master || 0, itemStyle: { color: '#1BCDF5' } },
-        // Taux d'insertion professionnelle à 18 mois, PROBLEME C'est dnas l'autre fichier qu'il y a ce tag, pas dans l'API
-        { value: data.xxxxx|| 0, itemStyle: { color: '#F5E11B' } },
+        // Taux d'insertion professionnelle à 18 mois
+        { value: data.taux_insert_18m|| 0, itemStyle: { color: '#F5E11B' } },
         // Taux d'emploi à 18 mois
-        { value: data.xxxxxxx || 0, itemStyle: { color: '#D60C57' } }
+        { value: data.taux_emploi_18m || 0, itemStyle: { color: '#D60C57' } }
     ];
 
     myChart.setOption({

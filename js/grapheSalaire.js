@@ -114,7 +114,7 @@ export function initGrapheSalaire() {
         },
         xAxis: {
             type: 'category',
-            data: ['salaire brut annuel', 'salaire médian', 'salaire net mensuel'],
+            data: ['salaire brut annuel', 'salaire médian annuel', 'salaire net annuel'],
             axisLabel: {
                 fontFamily: 'Readex Pro',
                 fontWeight: 700,

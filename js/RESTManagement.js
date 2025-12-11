@@ -1,63 +1,79 @@
+// RESTManagement.js - Gestion des appels à l'API MasterMind
+
+const URL_BASE_API = 'https://la-lab4ce.univ-lemans.fr/masters-stats/api/rest';
+
+// ------------------------------------------------------------------
+// 1. Appel pour les informations TEXTUELLES (Nom, Alternance, Parcours)
+// ------------------------------------------------------------------
 
 /**
- * effectue requete HTTP de recup des tentatives
- * retourne une promesse tjr resolue contenant le tableau des tentatives
- * @param {*} start instant le + ancien des traces à récupérer
- * @returns la promesse des tentatives
-
-export default function getLastAttemps(start=null) {
-    let url = 'http://127.0.0.1:5005/api/attempts';
-    if (start !== null){
-        url += '?start=' + start.toISOString(); //"2024-03..."
-    }
-    return fetch(url)
-    .then((reponse) => {
-        if(!reponse.ok){
-            throw new Error('Erreur de requête : ' + reponse.status);
-        }
-        return reponse.json();
-    })
-    .catch((error) => {
-        console.warn('Erreur de requête de recuperation des tentatives', error);
-        return []; //on retourne le tableau de tentative vide
-    })
-}
-     */
-
-
-// URL de l'API (à adapter selon si tu la lances en local ou si elle est en ligne)
-// Exemple local souvent utilisé : http://localhost:3000/api/stats
-//const API_URL = 'https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr-esr-mon_master/records';
-const API_URL = 'https://la-lab4ce.univ-lemans.fr/masters-stats/api/rest/academies';
-https://la-lab4ce.univ-lemans.fr/masters-stats/api/rest/etablissements
-
-/**
- * Récupère les statistiques du Master
- * @returns {Promise} Promesse contenant les données JSON
- * @param {string} ifc Identifiant de formation 
+ * Récupère les infos texte pour un IFC donné.
+ * @param {string} ifc - L'identifiant de la formation (ex: '0900816N1CXR').
+ * @returns {Promise<Object|null>} Les détails de la formation.
  */
-export async function getFormationByIfc(ifc) {
+export async function getFormationDetails(ifc) {
     try {
-        // Utilisation de encodeURIComponent pour sécuriser l'injection de la variable
-        const encodedIfc = encodeURIComponent(`"${ifc}"`);
-        const url = `${API_URL}?where=ifc=${encodedIfc}&limit=1`;
+        // Construction de l'URL
+        const url = `${URL_BASE_API}/formations/${ifc}?full-details=1`;
 
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP ${response.status}`);
-        }
-
-        const data = await response.json();
+        const reponse = await fetch(url);
         
-        if (!data.results || data.results.length === 0) {
-            return null;
+        // Vérifie si la réponse HTTP est OK (statut 200)
+        if (!reponse.ok) {
+            throw new Error(`Erreur de l'API: Statut ${reponse.status}`);
+        }
+        
+        return await reponse.json();
+
+    } catch (erreur) {
+        console.error("Problème lors de la récupération des détails de la formation :", erreur);
+        return null;
+    }
+}
+
+// ------------------------------------------------------------------
+// 2. Appel pour les informations STATISTIQUES (Capacité, Taux, Salaires)
+// ------------------------------------------------------------------
+
+/**
+ * @param {string} ifc - L'identifiant de la formation.
+ * @returns {Promise<Object|null>} Les statistiques de candidatures et d'insertion.
+ */
+export async function getStatsForMaster(ifc) {
+    try {
+        // Définition des données que nous demandons à l'API
+        const corpsDeRequete = {
+            "filters": {
+                // On filtre sur l'identifiant de la formation pour avoir des données précises
+                "formationIfcs": [ifc],
+                // On demande les stats d'insertion à 18 mois après le diplôme
+                "moisApresDiplome": 18 
+            },
+            "harvest": {
+                "typeStats": "all", // Demande toutes les stats (candidatures + insertions pro)
+                "candidatureDetails": ["general"], // Pour Capacite et Nombres (nb, accept)
+                "insertionProDetails": ["general", "salaire", "emplois"] // Pour Salaires et Types d'emplois
+            }
+        };
+
+        const url = `${URL_BASE_API}/stats/search`;
+
+        const reponse = await fetch(url, {
+            method: 'POST',
+            // On précise qu'on envoie du JSON
+            headers: { 'Content-Type': 'application/json' },
+            // On convertit notre objet JavaScript en chaîne de caractères JSON
+            body: JSON.stringify(corpsDeRequete) 
+        });
+
+        if (!reponse.ok) {
+            throw new Error(`Erreur de l'API POST: Statut ${reponse.status}`);
         }
 
-        return data.results[0];
+        return await reponse.json();
 
-    } catch (error) {
-        console.error("Erreur dans getFormationByIfc:", error);
-        throw error;
+    } catch (erreur) {
+        console.error("Problème lors de la récupération des statistiques :", erreur);
+        return null;
     }
 }
