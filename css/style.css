@@ -218,6 +218,7 @@ main {
     align-items: center;
 }
 
+
 nav {
     display: flex;
 }
@@ -362,10 +363,25 @@ nav {
     background-color: white;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     padding: 5px;
-    height: 300px;
-    width: 100%;
+    width: 60%;
     overflow: hidden;
     /* Empêche le canvas de déborder */
 }
 
 
+.liens img{
+    width: 20%;
+}
+
+.boiteNomMaster{
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
+}
+
+.nomMaster{
+    background-color: rgba(94, 94, 94, 0.164);
+    padding: 0.5rem;
+}
+
+}
