@@ -1,49 +1,8 @@
-/* const HEATMAP_SETTINGS_MAP = 'HEATMAPSETTINGSKEY';
+// Changez le nom de la clé (par exemple V2) pour invalider l'ancien cache automatiquement
+const MASTER_STATS_KEY = 'MASTER_STATS_DATA_V2'; 
 
-let monStockage = window.localStorage;
-
-export function saveHeatmapSettings(settings) {
-    if (!monStockage){
-        return;
-    }
-    monStockage.setItem(HEATMAP_SETTINGS_MAP, JSON.stringify(setting));
-}
-
-export function loadHeatmapSettings() {
-    if (!monStockage){
-        return null;
-    }
-    const rawData = monStockage.getItem(HEATMAP_SETTINGS_MAP);
-    if (rawData){
-        try {
-            return JSON.parse(rawData);
-        } catch (error){
-            console.warn('Données invalides dans le st');
-            return null;
-        }
-        
-        
-    }else{
-        return null;
-    }
-}
-
-function initCacheManagement(){
-    try{
-        const testKey = '_STORAGE_TEST';
-        window.localStorage.setItem(testKey, testKey);
-        window.localStorage.removeItem(testKey);
-        monStockage = window.localStorage;
-    }catch (error){
-        console.warn('LocalStorage indisponible');
-        monStockage =  null;
-    }
-}
-initCacheManagement(); */
-
-const MASTER_STATS_KEY = 'MASTER_STATS_DATA';
-const CACHE_DURATION = 1000 * 60 * 60; // 1 heure de validité (exemple)
-const TIMESTAMP_KEY = 'MASTER_STATS_TIME';
+const CACHE_DURATION = 1000 * 60 * 60; 
+const TIMESTAMP_KEY = 'MASTER_STATS_TIME_V2'; 
 
 let monStockage = window.localStorage;
 
@@ -61,7 +20,7 @@ export function loadStatsFromCache() {
 
     if (!rawData || !timestamp) return null;
 
-    // Vérification optionnelle de la durée de vie du cache
+    // Vérification de la durée de vie du cache
     const age = Date.now() - parseInt(timestamp, 10);
     if (age > CACHE_DURATION) {
         console.log("Cache expiré");

@@ -179,9 +179,9 @@ export function updateGrapheEmploi(data) {
 
     // Mise à jour en gardant VOS couleurs et libellés
     const newData = [
-        { value: data.nb_cadres || 800, name: 'Emplois cadre', itemStyle: { color: '#F5E11B' } },
-        { value: data.nb_stable || 550, name: 'Emplois stables', itemStyle: { color: '#1BCDF5' } },
-        { value: data.nb_temps_plein || 700, name: 'Emplois à temps plein', itemStyle: { color: '#D60C57' } },
+        { value: data.nb_cadres || 0, name: 'Emplois cadre', itemStyle: { color: '#F5E11B' } },
+        { value: data.nb_stable || 0, name: 'Emplois stables', itemStyle: { color: '#1BCDF5' } },
+        { value: data.nb_temps_plein || 0, name: 'Emplois à temps plein', itemStyle: { color: '#D60C57' } },
     ];
 
     myChart.setOption({

@@ -114,7 +114,7 @@ export function initGrapheSalaire() {
         },
         xAxis: {
             type: 'category',
-            data: ['salaire brut annuel', 'salaire médian', 'salaire net mensuel'],
+            data: ['salaire brut annuel', 'salaire médian annuel', 'salaire net annuel'],
             axisLabel: {
                 fontFamily: 'Readex Pro',
                 fontWeight: 700,
@@ -196,9 +196,9 @@ export function updateGrapheSalaire(data) {
     // Mise à jour des données en gardant VOS couleurs
     // Adaptez "data.salaire_brut" etc. selon les vrais noms de votre API
     const newData = [
-        { value: data.salaire_brut || 1500, itemStyle: { color: '#1BCDF5' } },  // salaire brut annuel
-        { value: data.salaire_median || 1000, itemStyle: { color: '#F5E11B' } },  // salaire médian
-        { value: data.salaire_net || 2000, itemStyle: { color: '#D60C57' } }   // salaire net mensuel
+        { value: data.salaire_brut || 0, itemStyle: { color: '#1BCDF5' } },  // salaire brut annuel
+        { value: data.salaire_median || 0, itemStyle: { color: '#F5E11B' } },  // salaire médian
+        { value: data.salaire_net || 0, itemStyle: { color: '#D60C57' } }   // salaire net mensuel
     ];
 
     myChart.setOption({
