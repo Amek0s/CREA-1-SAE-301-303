@@ -1,132 +1,126 @@
-// orchestrator.js - Le fichier qui coordonne tout
+// --- CONFIGURATION ---
+const IFC_ACTUEL = '0900816N1CXR'; 
 
-// 1. On importe les fonctions qui font les appels API
+// --- IMPORTS ---
 import { getFormationDetails, getStatsForMaster } from "./RESTManagement.js";
 import { saveStatsToCache, loadStatsFromCache } from "./cacheManagement.js";
-
-// 2. On importe les fonctions qui dessinent les graphiques (on suppose que ces fichiers sont là)
 import { initGrapheSalaire, updateGrapheSalaire } from "./grapheSalaire.js";
 import { initGrapheEmploi, updateGrapheEmploi } from "./grapheEmploi.js"; 
 import { initGrapheAdmission, updateGrapheAdmission } from "./grapheAdmission.js"; 
 
-// --- PARTIE 1 : Mise à Jour de l'Interface TEXTUELLE (Nom, Alternance, Capacité) ---
+// --- FONCTIONS ---
 
-function mettreAJourInfosClees(detailsFormation, statsAPI) {
+function updateTextElements(details, stats) {
+    if (!details) return;
     
-    // a. Extraction des données contextuelles (Infos simples)
-    const nomDuMaster = detailsFormation?.mention || "Intitulé inconnu";
-    const parcours = detailsFormation?.parcours || "Parcours non spécifié";
-    const nomEtablissement = detailsFormation?.etablissement || "Établissement inconnu";
-    // L'alternance est un booléen (true/false) que l'on transforme en texte
-    const alternancePossible = detailsFormation?.alternance ? "Oui" : "Non"; 
+    // On prend la première candidature (car filtré par IFC, il n'y en a qu'une ou deux)
+    const cand = (stats && stats.candidatures && stats.candidatures.length > 0) 
+                 ? stats.candidatures[0].general 
+                 : {};
 
-    // b. Extraction de la Capacité (vient des statistiques)
-    // On cherche l'objet 'general' du premier élément du tableau 'candidatures'
-    const capaciteDAccueil = statsAPI?.candidatures?.[0]?.general?.capacite || "N/A";
-
-    // c. Mise à jour des éléments HTML
-    document.getElementById('disci_master').textContent = "Master " + nomDuMaster;
-    document.getElementById('parcours').textContent = parcours;
-    document.getElementById('nomEtab').textContent = nomEtablissement;
-    document.getElementById('alternance').textContent = alternancePossible;
-    document.getElementById('col').textContent = capaciteDAccueil;
+    document.getElementById('disci_master').textContent = "Master " + (details.mention || "Inconnu");
+    document.getElementById('parcours').textContent = details.parcours || "";
+    document.getElementById('nomEtab').textContent = details.etablissement || "";
+    document.getElementById('alternance').textContent = details.alternance ? "Oui" : "Non";
+    document.getElementById('col').textContent = cand.capacite || "N/A";
 }
 
-// --- PARTIE 2 : Préparation des Données pour les Graphiques ---
+function formatDataForCharts(stats, secDiscIdVise) {
+    // 1. ADMISSION
+    const cand = (stats.candidatures && stats.candidatures.length > 0) 
+                 ? stats.candidatures[0].general 
+                 : { nb: 0, accept: 0 };
 
-function preparerDonneesGraphiques(apiStats) {
-    const statsCandidatures = apiStats?.candidatures?.[0]?.general || {};
-    const statsInsertion = apiStats?.insertionsPro?.[0] || {};
-    const statsInsertionGeneral = statsInsertion.general || {};
-    const salaire = statsInsertion.salaire || {}; 
-
-    // Calcul du Taux d'admission : (Acceptés / Candidats Totaux) * 100
-    const nbAccept = statsCandidatures.accept || 0;
-    const nbCandidats = statsCandidatures.nb || 0;
-    const tauxAdmission = nbCandidats > 0 ? (nbAccept / nbCandidats) * 100 : 0;
+    // 2. INSERTION PRO
+    let insert = {};
     
-    // --- Correction Salaire : Conversion Mensuel -> Annuel (Multiplication par 12) ---
-    // La donnée API pour la médiane (netMedianTempsPlein) est considérée comme mensuelle
-    const netMedianMensuel = salaire.netMedianTempsPlein || 0;
-    
-    // CALCUL : On annualise les données mensuelles pour l'échelle du graphique
-    const salaireMedianAnnuel = netMedianMensuel * 12;
-    const salaireNetAnnuel = netMedianMensuel * 12;
-    // -----------------------------------------------------------------------------------
+    if (stats.insertionsPro && stats.insertionsPro.length > 0) {
+        // A. On cherche la correspondance exacte avec le secteur disciplinaire
+        const statTrouvee = stats.insertionsPro.find(s => 
+            s.relations && s.relations.secDiscIds && s.relations.secDiscIds.includes(secDiscIdVise)
+        );
 
-    // L'objet final envoyé aux fonctions de graphiques doit avoir ces clés
+        if (statTrouvee) {
+            console.log("Données précises trouvées (Secteur Disc.)");
+            insert = statTrouvee;
+        } else {
+            console.warn("Pas de correspondance exacte, utilisation de la moyenne établissement.");
+            insert = stats.insertionsPro[0];
+        }
+    }
+
+    const gen = insert.general || {};
+    const sal = insert.salaire || {};
+    const emp = insert.emplois || {};
+
+    const tauxAdm = cand.nb > 0 ? (cand.accept / cand.nb * 100) : 0;
+    const salaireMensuel = sal.netMedianTempsPlein || 0;
+
     return {
-        // Taux pour grapheAdmission.js
-        pct_accept_master: tauxAdmission.toFixed(1), 
-        taux_insert_18m: statsInsertionGeneral.tauxInsertion || 0, 
-        taux_emploi_18m: statsInsertionGeneral.tauxEmploi || 0, 
-
-        // Salaires pour grapheSalaire.js (UTILISATION DES VALEURS ANNUELLES CALCULÉES)
-        salaire_brut: salaire.brutAnnuelEstime || 0, // Déjà annuel
-        salaire_median: salaireMedianAnnuel,         // <-- CORRECTION APPLIQUÉE ICI
-        salaire_net: salaireNetAnnuel,               // <-- CORRECTION APPLIQUÉE ICI
-
-        // Emplois pour grapheEmploi.js
-        nb_cadres: statsInsertion.emplois?.cadre || 0,
-        nb_stable: statsInsertion.emplois?.stable || 0,
-        nb_temps_plein: statsInsertion.emplois?.tempsPlein || 0
+        pct_accept_master: tauxAdm,
+        taux_insert_18m: gen.tauxInsertion || 0,
+        taux_emploi_18m: gen.tauxEmploi || 0,
+        salaire_brut: sal.brutAnnuelEstime || 0,
+        salaire_median: salaireMensuel * 12, 
+        salaire_net: salaireMensuel * 12,
+        nb_cadres: emp.cadre || 0,
+        nb_stable: emp.stable || 0,
+        nb_temps_plein: emp.tempsPlein || 0
     };
 }
 
-// --- PARTIE 3 : Initialisation et Lancement ---
-
-function initAllCharts() {
-    initGrapheSalaire();
-    initGrapheEmploi();
-    initGrapheAdmission();
-}
-
-function updateAllCharts(data) {
-    updateGrapheSalaire(data);
-    updateGrapheEmploi(data);
-    updateGrapheAdmission(data);
-}
+// --- MAIN ---
 
 async function main() {
-    
-    const ifcActuel = '1402116P7TV1'; 
+    initGrapheSalaire(); initGrapheEmploi(); initGrapheAdmission();
 
-    initAllCharts();
-    
-    // Tente de charger depuis le cache avant de faire l'appel API
-    let donneesEnCache = loadStatsFromCache();
+    console.log(`Démarrage pour IFC : ${IFC_ACTUEL}`);
 
-    if (donneesEnCache && donneesEnCache.ifc === ifcActuel) {
-        console.log("Données chargées depuis le cache.");
-        mettreAJourInfosClees(donneesEnCache.formation, donneesEnCache.statsRaw);
-        updateAllCharts(donneesEnCache.statsProcessed);
-        return; 
+    let data = loadStatsFromCache();
+    
+    // Invalidation si changement d'IFC
+    if (data && data.ifc !== IFC_ACTUEL) {
+        console.log("Nouvel IFC détecté, nettoyage du cache...");
+        data = null; 
     }
-    
-    // Si pas de cache : Lancement des deux appels API en même temps (promesses)
-    console.log("Appel API en cours...");
-    const [details, stats] = await Promise.all([
-        getFormationDetails(ifcActuel),
-        getStatsForMaster(ifcActuel)
-    ]);
-    
-    if (details && stats) {
-        // Traitement des données
-        const statsPrepares = preparerDonneesGraphiques(stats);
+
+    if (!data) {
+        console.log("Appel API en cours...");
         
-        // Mise à jour de l'affichage
-        mettreAJourInfosClees(details, stats);
-        updateAllCharts(statsPrepares);
-        
-        // Sauvegarde des nouvelles données
-        saveStatsToCache({
-            ifc: ifcActuel, 
-            formation: details, 
-            statsRaw: stats, 
-            statsProcessed: statsPrepares
-        });
+        const details = await getFormationDetails(IFC_ACTUEL);
+
+        if (details) {
+            // Récupération sécurisée de l'UAI
+            const uai = details.etabUai || details.uai; 
+            const secDiscId = details.secDiscId || details.secteurDisciplinaireId;
+
+            if (!uai) {
+                console.error("Impossible de trouver l'UAI de cet établissement !");
+                return;
+            }
+
+            // Appel avec les identifiants
+            const stats = await getStatsForMaster(IFC_ACTUEL, uai);
+
+            if (stats) {
+                data = {
+                    ifc: IFC_ACTUEL,
+                    details: details,
+                    statsRaw: stats,
+                    formatted: formatDataForCharts(stats, secDiscId)
+                };
+                saveStatsToCache(data);
+            }
+        }
     } else {
-        console.error("Impossible de récupérer une ou plusieurs sources de données API. Vérifiez l'IFC ou la connexion.");
+        console.log("Données chargées du cache.");
+    }
+
+    if (data && data.formatted) {
+        updateTextElements(data.details, data.statsRaw);
+        updateGrapheSalaire(data.formatted);
+        updateGrapheEmploi(data.formatted);
+        updateGrapheAdmission(data.formatted);
     }
 }
 

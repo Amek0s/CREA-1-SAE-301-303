@@ -1,8 +1,8 @@
 // Changez le nom de la clé (par exemple V2) pour invalider l'ancien cache automatiquement
-const MASTER_STATS_KEY = 'MASTER_STATS_DATA_V2'; 
+const MASTER_STATS_KEY = 'MASTER_STATS_DATA_V3'; 
 
 const CACHE_DURATION = 1000 * 60 * 60; 
-const TIMESTAMP_KEY = 'MASTER_STATS_TIME_V2'; 
+const TIMESTAMP_KEY = 'MASTER_STATS_TIME_V3'; 
 
 let monStockage = window.localStorage;
 

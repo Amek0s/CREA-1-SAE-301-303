@@ -1,79 +1,68 @@
-// RESTManagement.js - Gestion des appels à l'API MasterMind
+// RESTManagement.js - Version Double Requête (Candidature + Insertion)
 
 const URL_BASE_API = 'https://la-lab4ce.univ-lemans.fr/masters-stats/api/rest';
 
-// ------------------------------------------------------------------
-// 1. Appel pour les informations TEXTUELLES (Nom, Alternance, Parcours)
-// ------------------------------------------------------------------
-
-/**
- * Récupère les infos texte pour un IFC donné.
- * @param {string} ifc - L'identifiant de la formation (ex: '0900816N1CXR').
- * @returns {Promise<Object|null>} Les détails de la formation.
- */
 export async function getFormationDetails(ifc) {
     try {
-        // Construction de l'URL
         const url = `${URL_BASE_API}/formations/${ifc}?full-details=1`;
-
         const reponse = await fetch(url);
-        
-        // Vérifie si la réponse HTTP est OK (statut 200)
-        if (!reponse.ok) {
-            throw new Error(`Erreur de l'API: Statut ${reponse.status}`);
-        }
-        
+        if (!reponse.ok) throw new Error(`Erreur API Formations: ${reponse.status}`);
         return await reponse.json();
-
     } catch (erreur) {
-        console.error("Problème lors de la récupération des détails de la formation :", erreur);
+        console.error("Erreur détails formation :", erreur);
         return null;
     }
 }
 
-// ------------------------------------------------------------------
-// 2. Appel pour les informations STATISTIQUES (Capacité, Taux, Salaires)
-// ------------------------------------------------------------------
-
-/**
- * @param {string} ifc - L'identifiant de la formation.
- * @returns {Promise<Object|null>} Les statistiques de candidatures et d'insertion.
- */
-export async function getStatsForMaster(ifc) {
+export async function getStatsForMaster(ifc, uai) {
     try {
-        // Définition des données que nous demandons à l'API
-        const corpsDeRequete = {
-            "filters": {
-                // On filtre sur l'identifiant de la formation pour avoir des données précises
-                "formationIfcs": [ifc],
-                // On demande les stats d'insertion à 18 mois après le diplôme
-                "moisApresDiplome": 18 
-            },
-            "harvest": {
-                "typeStats": "all", // Demande toutes les stats (candidatures + insertions pro)
-                "candidatureDetails": ["general"], // Pour Capacite et Nombres (nb, accept)
-                "insertionProDetails": ["general", "salaire", "emplois"] // Pour Salaires et Types d'emplois
-            }
+        // --- REQUÊTE 1 : CANDIDATURES (Filtrée par IFC précis) ---
+        const promiseCandidatures = fetch(`${URL_BASE_API}/stats/search`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                "filters": { 
+                    "formationIfcs": [ifc],
+                    "annees": [2022, 2023] // On cible les années récentes
+                },
+                "harvest": {
+                    "typeStats": "candidatures",
+                    "candidatureDetails": ["general"]
+                }
+            })
+        }).then(res => res.ok ? res.json() : { candidatures: [] });
+
+        // --- REQUÊTE 2 : INSERTION PRO (Filtrée par Etablissement uniquement) ---
+        // On ne met PAS "formationIfcs" ici, sinon ça renvoie 0 résultat
+        const promiseInsertion = fetch(`${URL_BASE_API}/stats/search`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                "filters": { 
+                    "etablissementIds": [uai],
+                    "moisApresDiplome": 30 
+                },
+                "harvest": {
+                    "typeStats": "insertionsPro",
+                    "insertionProDetails": ["general", "salaire", "emplois"]
+                }
+            })
+        }).then(res => res.ok ? res.json() : { insertionsPro: [] });
+
+        // On attend que les deux finissent
+        const [resultatCand, resultatInsert] = await Promise.all([promiseCandidatures, promiseInsertion]);
+
+        console.log("📦 Candidatures reçues :", resultatCand.candidatures?.length);
+        console.log("📦 Insertion reçue (lignes) :", resultatInsert.insertionsPro?.length);
+
+        // On fusionne les deux résultats en un seul objet pour l'orchestrator
+        return {
+            candidatures: resultatCand.candidatures || [],
+            insertionsPro: resultatInsert.insertionsPro || []
         };
 
-        const url = `${URL_BASE_API}/stats/search`;
-
-        const reponse = await fetch(url, {
-            method: 'POST',
-            // On précise qu'on envoie du JSON
-            headers: { 'Content-Type': 'application/json' },
-            // On convertit notre objet JavaScript en chaîne de caractères JSON
-            body: JSON.stringify(corpsDeRequete) 
-        });
-
-        if (!reponse.ok) {
-            throw new Error(`Erreur de l'API POST: Statut ${reponse.status}`);
-        }
-
-        return await reponse.json();
-
     } catch (erreur) {
-        console.error("Problème lors de la récupération des statistiques :", erreur);
-        return null;
+        console.error("Erreur récupération stats :", erreur);
+        return { candidatures: [], insertionsPro: [] };
     }
 }
