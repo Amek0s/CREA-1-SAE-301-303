@@ -7,41 +7,83 @@ import { initGrapheAdmission, updateGrapheAdmission } from "./grapheAdmission.js
 let map = null;
 let marker = null;
 
+// Lecture de l'URL
 const urlParams = new URLSearchParams(window.location.search);
-const IFC_ACTUEL = urlParams.get('ifc') || '0900816N1CXR'; 
+let IFC_ACTUEL = urlParams.get('ifc');
+
+// Valeur par défaut pour tester si pas d'IFC
+if (IFC_ACTUEL === null) {
+    IFC_ACTUEL = '1302436S61PT';
+}
 
 function updateTextElements(details, stats, sourceInsertion) {
     if (!details) return;
     
-    // Sécurisation : on prend la première candidature dispo ou vide
-    const cand = (stats && stats.candidatures && stats.candidatures.length > 0) 
-                 ? stats.candidatures[0].general 
-                 : {};
+    // 1. Candidatures
+    let infoCandidature = {};
+    if (stats.candidatures && stats.candidatures.length > 0) {
+        infoCandidature = stats.candidatures[0].general;
+    }
 
-    const mention = details.mention || "Information non disponible";
-    const parcours = details.parcours || "";
-    const etablissement = details.etablissement || details.etablissementLibelle || "Établissement inconnu";
+    // 2. Textes par défaut
+    let mention = "Information non disponible";
+    if (details.mention) {
+        mention = details.mention;
+    }
 
+    let parcours = "";
+    if (details.parcours) {
+        parcours = details.parcours;
+    }
+
+    let etablissement = "Établissement inconnu";
+    if (details.etablissement) {
+        etablissement = details.etablissement;
+    } else if (details.etablissementLibelle) {
+        etablissement = details.etablissementLibelle;
+    }
+
+    // 3. Mise à jour HTML
     const elTitre = document.getElementById('disci_master');
     const elParcours = document.getElementById('parcours');
     const elEtab = document.getElementById('nomEtab');
     const elAlt = document.getElementById('alternance');
     const elCol = document.getElementById('col');
 
-    if(elTitre) elTitre.textContent = "Master " + mention;
-    if(elParcours) elParcours.textContent = parcours;
-    if(elEtab) elEtab.textContent = etablissement;
+    if (elTitre) elTitre.textContent = "Master " + mention;
+    if (elParcours) elParcours.textContent = parcours;
+    if (elEtab) elEtab.textContent = etablissement;
     
-    const isAlternance = details.alternance || (details.modalites && details.modalites.includes('apprentissage'));
-    if(elAlt) elAlt.textContent = isAlternance ? "Oui" : "Non";
-    
-    if(elCol) elCol.textContent = cand.capacite || "N/A";
+    // Alternance
+    let isAlternance = false;
+    if (details.alternance === true) {
+        isAlternance = true;
+    } else if (details.modalites && details.modalites.includes('apprentissage')) {
+        isAlternance = true;
+    }
 
-    // Gestion du message d'avertissement si les données sont globales
+    if (elAlt) {
+        if (isAlternance === true) {
+            elAlt.textContent = "Oui";
+        } else {
+            elAlt.textContent = "Non";
+        }
+    }
+    
+    // Capacité
+    if (elCol) {
+        if (infoCandidature.capacite) {
+            elCol.textContent = infoCandidature.capacite;
+        } else {
+            elCol.textContent = "N/A";
+        }
+    }
+
+    // Avertissement si données estimées
     const elStatsTitle = document.getElementById('stats-title');
     if (elStatsTitle) {
         if (sourceInsertion === 'etablissement_global') {
-            elStatsTitle.innerHTML = "QUELQUES CHIFFRES <br><span style='font-size:0.6em; text-transform:none; color:var(--text-secondary);'>(Données estimées : Moyenne établissement)</span>";
+            elStatsTitle.innerHTML = "QUELQUES CHIFFRES <br><span style='font-size:0.6em;color:var(--text-secondary);'>(Données estimées : Moyenne établissement)</span>";
         } else {
             elStatsTitle.textContent = "QUELQUES CHIFFRES";
         }
@@ -50,29 +92,41 @@ function updateTextElements(details, stats, sourceInsertion) {
 
 async function updateMapOpenSource(details) {
     if (!details) return;
+    
     const divMap = document.getElementById('osm-map');
     if (!divMap) return;
 
-    if (!map) {
-        map = L.map('osm-map').setView([46.603354, 1.888334], 6);
+    if (map === null) {
+        map = L.map('osm-map').setView([46.603354, 1.888334], 6); 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
     }
 
-    const nom = details.etablissement || details.etablissementLibelle || "";
-    const ville = details.ville || "";
-    const cp = details.codePostal || "";
+    let nom = "";
+    if (details.etablissement) nom = details.etablissement;
+    else if (details.etablissementLibelle) nom = details.etablissementLibelle;
+
+    let ville = "";
+    if (details.ville) ville = details.ville;
+
+    let cp = "";
+    if (details.codePostal) cp = details.codePostal;
+    
     const query = `${nom} ${ville} ${cp}`.trim();
     
     if (query.length === 0) return;
 
     try {
         const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
-        const r = await fetch(url);
-        const results = await r.json();
+        const reponse = await fetch(url);
+        const resultats = await reponse.json();
 
-        if (results && results.length > 0) {
-            const { lat, lon } = results[0];
+        if (resultats && resultats.length > 0) {
+            const premierResultat = resultats[0];
+            const lat = premierResultat.lat;
+            const lon = premierResultat.lon;
+
             map.setView([lat, lon], 15);
+
             if (marker) map.removeLayer(marker);
             marker = L.marker([lat, lon]).addTo(map).bindPopup(`<b>${nom}</b><br>${ville}`).openPopup();
         }
@@ -80,78 +134,115 @@ async function updateMapOpenSource(details) {
 }
 
 function formatDataForCharts(stats) {
-    const cand = stats.candidatures?.[0]?.general || { nb: 0, accept: 0 };
+    let infoCand = { nb: 0, accept: 0 };
+    if (stats.candidatures && stats.candidatures[0] && stats.candidatures[0].general) {
+        infoCand = stats.candidatures[0].general;
+    }
     
-    // Insertion pro peut être vide, ou remplie par le fallback
-    let insert = {};
+    let infoInsert = {};
     if (stats.insertionsPro && stats.insertionsPro.length > 0) {
-        // On prend le premier élément (le plus pertinent retourné par l'API)
-        insert = stats.insertionsPro[0];
+        infoInsert = stats.insertionsPro[0];
     }
 
-    const gen = insert.general || {};
-    const sal = insert.salaire || {};
-    const emp = insert.emplois || {};
+    // Récupération sécurisée des sous-objets
+    let general = {};
+    if (infoInsert.general) general = infoInsert.general;
 
-    // Calcul du taux d'admission
-    const tauxAdm = cand.nb > 0 ? (cand.accept / cand.nb * 100) : 0;
-    const salaireMensuel = sal.netMedianTempsPlein || 0;
+    let salaire = {};
+    if (infoInsert.salaire) salaire = infoInsert.salaire;
+
+    let emplois = {};
+    if (infoInsert.emplois) emplois = infoInsert.emplois;
+
+    let tauxAdm = 0;
+    if (infoCand.nb > 0) {
+        tauxAdm = (infoCand.accept / infoCand.nb) * 100;
+    }
+    
+    let salaireMensuel = 0;
+    if (salaire.netMedianTempsPlein) {
+        salaireMensuel = salaire.netMedianTempsPlein;
+    }
+
+    let tauxInsertion = 0;
+    if (general.tauxInsertion) tauxInsertion = general.tauxInsertion;
+
+    let tauxEmploi = 0;
+    if (general.tauxEmploi) tauxEmploi = general.tauxEmploi;
+
+    let salaireBrut = 0;
+    if (salaire.brutAnnuelEstime) salaireBrut = salaire.brutAnnuelEstime;
+
+    let nbCadres = 0;
+    if (emplois.cadre) nbCadres = emplois.cadre;
+
+    let nbStable = 0;
+    if (emplois.stable) nbStable = emplois.stable;
+
+    let nbTempsPlein = 0;
+    if (emplois.tempsPlein) nbTempsPlein = emplois.tempsPlein;
 
     return {
-        // Données pour grapheAdmission
         pct_accept_master: Math.round(tauxAdm),
-        taux_insert_18m: gen.tauxInsertion || 0,
-        taux_emploi_18m: gen.tauxEmploi || 0,
+        taux_insert_18m: tauxInsertion,
+        taux_emploi_18m: tauxEmploi,
 
-        // Données pour grapheSalaire
-        salaire_brut: sal.brutAnnuelEstime || 0,
+        salaire_brut: salaireBrut,
         salaire_median: salaireMensuel * 12, 
         salaire_net: salaireMensuel * 12,
 
-        // Données pour grapheEmploi
-        nb_cadres: emp.cadre || 0,
-        nb_stable: emp.stable || 0,
-        nb_temps_plein: emp.tempsPlein || 0
+        nb_cadres: nbCadres,
+        nb_stable: nbStable,
+        nb_temps_plein: nbTempsPlein
     };
 }
 
 async function main() {
-    // Initialisation des 3 graphes de base
     initGrapheSalaire(); 
     initGrapheEmploi(); 
     initGrapheAdmission();
 
-    console.log(`IFC : ${IFC_ACTUEL}`);
+    console.log(`Code IFC actuel : ${IFC_ACTUEL}`);
 
-    let data = loadStatsFromCache();
-    if (data && data.ifc !== IFC_ACTUEL) data = null;
+    let donneesGlobales = loadStatsFromCache();
 
-    if (!data) {
+    if (donneesGlobales) {
+        if (donneesGlobales.ifc !== IFC_ACTUEL) {
+            donneesGlobales = null;
+        }
+    }
+
+    if (donneesGlobales === null) {
         const details = await getFormationDetails(IFC_ACTUEL);
+        
         if (details) {
-            const uai = details.etabUai || details.uai;
-            const secDiscId = details.secDiscId || details.sectDiscId || details.secteurDisciplinaireId;
+            let uai = details.etabUai;
+            if (!uai) uai = details.uai;
 
-            // Appel API avec la logique Fallback
+            let secDiscId = details.secDiscId;
+            if (!secDiscId) secDiscId = details.sectDiscId;
+            if (!secDiscId) secDiscId = details.secteurDisciplinaireId;
+
             const statsBundle = await getStatsForMaster(IFC_ACTUEL, uai, secDiscId);
             
-            data = {
+            donneesGlobales = {
                 ifc: IFC_ACTUEL,
                 details: details,
                 statsRaw: statsBundle,
                 formatted: formatDataForCharts(statsBundle)
             };
-            saveStatsToCache(data);
+
+            saveStatsToCache(donneesGlobales);
         }
     }
 
-    if (data && data.formatted) {
-        updateTextElements(data.details, data.statsRaw, data.statsRaw.sourceInsertion);
-        updateMapOpenSource(data.details);
+    if (donneesGlobales && donneesGlobales.formatted) {
+        updateTextElements(donneesGlobales.details, donneesGlobales.statsRaw, donneesGlobales.statsRaw.sourceInsertion);
+        updateMapOpenSource(donneesGlobales.details);
         
-        updateGrapheSalaire(data.formatted);
-        updateGrapheEmploi(data.formatted);
-        updateGrapheAdmission(data.formatted);
+        updateGrapheSalaire(donneesGlobales.formatted);
+        updateGrapheEmploi(donneesGlobales.formatted);
+        updateGrapheAdmission(donneesGlobales.formatted);
     } else {
         const title = document.getElementById('disci_master');
         if(title) title.textContent = "Données indisponibles";
