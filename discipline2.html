@@ -1,18 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MasterMind - Choisir un Master</title>
-    <meta name="description" content="Liste des masters disponibles dans cette discipline.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Paytone+One&family=Readex+Pro:wght@160..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css" type="text/css">
     <link rel="icon" href="./images/mascotte-chill.png" type="image/png">
 </head>
-
 <body>
     <header role="banner">
         <img src="./images/logo-v2.svg" class="logo-header" alt="Logo MasterMind">
@@ -26,32 +23,18 @@
     <main role="main">
         <section class="trouver-discipline" aria-labelledby="titre-master">
             <h1 id="titre-master">Choisir mon Master</h1>
-            
-            <p class="subtitle">Sélectionnez une formation pour voir les détails</p>
+            <p class="subtitle" id="subtitle-secteur">Chargement...</p>
 
-            <div class="boiteNomMaster">
-                <a href="index.html" class="nomMaster" role="button">Master Droit des affaires</a>
-                <a href="index.html" class="nomMaster" role="button">Master Droit public</a>
-                <a href="index.html" class="nomMaster" role="button">Master Droit notarial</a>
-                <a href="index.html" class="nomMaster" role="button">Master Droit du numérique</a>
-                <a href="index.html" class="nomMaster" role="button">Master Science Politique</a>
-                <a href="index.html" class="nomMaster" role="button">Master Économie appliquée</a>
-                <a href="index.html" class="nomMaster" role="button">Master Justice et procès</a>
-                <a href="index.html" class="nomMaster" role="button">Master Droit social</a>
-            </div>
+            <div class="boiteNomMaster"></div>
         </section>
     </main>
 
     <footer role="contentinfo">
         <div class="footer-content">
             <img src="./images/mascotte-chill.png" alt="Logo MasterMind">
-            <nav aria-label="Réseaux sociaux" class="social-nav">
-                <a class="liens" href="https://www.instagram.com" target="_blank" aria-label="Instagram"><img src="./images/instagram_logo.svg" alt=""></a>
-                <a class="liens" href="https://www.facebook.com" target="_blank" aria-label="Facebook"><img src="./images/facebook_logo.svg" alt=""></a>
-                <a class="liens" href="https://www.linkedin.com" target="_blank" aria-label="LinkedIn"><img src="./images/linkedin_logo.svg" alt=""></a>
-            </nav>
-            <p>© 2025 MMI Laval</p>
+            <p>© 2025 MasterMind</p>
         </div>
     </footer>
+    <script type="module" src="./js/discipline2.js"></script>
 </body>
 </html>

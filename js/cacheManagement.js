@@ -1,8 +1,8 @@
-// Changez le nom de la clé (par exemple V2) pour invalider l'ancien cache automatiquement
-const MASTER_STATS_KEY = 'MASTER_STATS_DATA_V3'; 
+// Changement de version pour invalider le cache buggé précédent
+const MASTER_STATS_KEY = 'MASTER_STATS_DATA_V4'; 
 
 const CACHE_DURATION = 1000 * 60 * 60; 
-const TIMESTAMP_KEY = 'MASTER_STATS_TIME_V3'; 
+const TIMESTAMP_KEY = 'MASTER_STATS_TIME_V4'; 
 
 let monStockage = window.localStorage;
 
@@ -20,17 +20,14 @@ export function loadStatsFromCache() {
 
     if (!rawData || !timestamp) return null;
 
-    // Vérification de la durée de vie du cache
     const age = Date.now() - parseInt(timestamp, 10);
     if (age > CACHE_DURATION) {
-        console.log("Cache expiré");
         return null; 
     }
 
     try {
         return JSON.parse(rawData);
     } catch (error) {
-        console.warn('Données de cache corrompues');
         return null;
     }
 }
