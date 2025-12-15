@@ -12,77 +12,66 @@ export function initGrapheAdmission() {
     const option = {
         textStyle: {
             fontFamily: 'Readex Pro',
-            fontWeight: 700,
-            fontSize: 10
+            fontWeight: 500,
+            fontSize: 14
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'shadow' }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
         },
         xAxis: {
             type: 'category',
-            // Utilisation de labels lisibles pour les catégories
-            data: ['Taux admission', 'Taux insertion', 'Taux emploi'],
+            data: ['Admission', 'Insertion', 'Emploi'],
             axisLabel: {
                 fontFamily: 'Readex Pro',
-                fontWeight: 700,
-                fontSize: 10,
-                color: '#000'
+                fontWeight: 500,
+                fontSize: 12,
+                color: '#2D1A22'
             },
             axisLine: {
-                lineStyle: {
-                    color: '#000',
-                    width: 1
-                }
+                lineStyle: { color: '#66585E' }
             },
-            axisTick: {
-                lineStyle: {
-                    color: '#BA396B',
-                    width: 1
-                }
-            }
+            axisTick: { show: false }
         },
         yAxis: {
             type: 'value',
+            max: 100, // Pourcentage donc max 100
             axisLabel: {
                 fontFamily: 'Readex Pro',
-                fontWeight: 700,
-                fontSize: 10,
-                color: '#000'
-            },
-            axisLine: {
-                lineStyle: {
-                    color: '#000',
-                    width: 1
-                }
+                fontSize: 12,
+                color: '#66585E',
+                formatter: '{value}%'
             },
             splitLine: {
                 lineStyle: {
-                    color: '#BA396B',
-                    width: 1,
-                    type: 'solid'
-                }
-            },
-            axisTick: {
-                lineStyle: {
-                    color: '#BA396B',
-                    width: 1
+                    color: '#FFE0E9',
+                    type: 'dashed'
                 }
             }
         },
         series: [
             {
                 type: 'bar',
-                // Données initiales
+                barWidth: '40%',
                 data: [
-                    { value: 0, itemStyle: { color: '#1BCDF5' } },
-                    { value: 0, itemStyle: { color: '#F5E11B' } },
-                    { value: 0, itemStyle: { color: '#D60C57' } }
+                    { value: 0, itemStyle: { color: '#1BCDF5', borderRadius: [5, 5, 0, 0] } },
+                    { value: 0, itemStyle: { color: '#F5E11B', borderRadius: [5, 5, 0, 0] } },
+                    { value: 0, itemStyle: { color: '#E6136A', borderRadius: [5, 5, 0, 0] } }
                 ],
                 label: {
                     show: true,
                     fontFamily: 'Readex Pro',
-                    fontWeight: 700,
-                    fontSize: 10,
-                    color: '#000',
+                    fontWeight: 'bold',
+                    fontSize: 14,
+                    color: '#2D1A22',
                     position: 'top',
-                    formatter: '{c}%' // Ajout de l'unité
+                    formatter: '{c}%'
                 }
             }
         ]
@@ -98,14 +87,10 @@ export function initGrapheAdmission() {
 export function updateGrapheAdmission(data) {
     if (!myChart || !data) return;
 
-    // Mise à jour des données en utilisant les champs réels de l'API Mon Master
     const newData = [
-        // Taux d'acceptation du master (en pourcentage)
-        { value: data.pct_accept_master || 0, itemStyle: { color: '#1BCDF5' } },
-        // Taux d'insertion professionnelle à 18 mois
-        { value: data.taux_insert_18m|| 0, itemStyle: { color: '#F5E11B' } },
-        // Taux d'emploi à 18 mois
-        { value: data.taux_emploi_18m || 0, itemStyle: { color: '#D60C57' } }
+        { value: data.pct_accept_master || 0, itemStyle: { color: '#1BCDF5', borderRadius: [5, 5, 0, 0] } },
+        { value: data.taux_insert_18m|| 0, itemStyle: { color: '#F5E11B', borderRadius: [5, 5, 0, 0] } },
+        { value: data.taux_emploi_18m || 0, itemStyle: { color: '#E6136A', borderRadius: [5, 5, 0, 0] } }
     ];
 
     myChart.setOption({

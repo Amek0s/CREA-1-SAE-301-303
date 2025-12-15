@@ -2,137 +2,127 @@
 <html lang="fr">
 
 <head>
-    <title>MasterMind - Ton master bien pensé !</title>
-    <meta name="description" content="Trouvez le master de vos rêves avec MasterMind">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-    <meta name="description" content="Trouvez un master en fonction de vos passions et compétences">
+    <title>MasterMind - Choisir une discipline</title>
+    <meta name="description" content="Sélectionnez votre domaine d'études pour trouver le master idéal.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Paytone+One&family=Readex+Pro:wght@160..700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Paytone+One&family=Readex+Pro:wght@160..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css" type="text/css">
-    <link rel="icon" href="./images/mascotte-chill.png" type="image/w-icon">
-
-    <script src="https://fastly.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-    <!--NORMALEMENT ON A PAS BESOIN DE RELIER AVEC SCRIPT C'EST ORCHESTRATOR QUI GERE-->
-   <!-- <script src="./js/grapheEmploi.js" defer></script>
-    <script src="./js/grapheSalaire.js" defer></script>
-    <script src="./js/grapheAdmission.js" defer></script> -->
-    <script type="module" src="./js/orchestrator.js"></script>
-
+    <link rel="icon" href="./images/mascotte-chill.png" type="image/png">
 </head>
 
 <body>
-    <header>
-        <img src="./images/logo-v2.svg" class="logo-header" alt="Mascotte MasterMind">
-        <button class="btn-menu">
-            <a href="index.html" class="btn-menu">
-                <img src="./images/icone_maison.svg" alt="Ouvrir le filtre" class="icone-filtre">
+    <header role="banner">
+        <img src="./images/logo-v2.svg" class="logo-header" alt="Logo MasterMind">
+        <nav role="navigation" aria-label="Menu principal">
+            <a href="index.html" class="btn-menu" aria-label="Retour à l'accueil">
+                <img src="./images/icone_maison.svg" alt="Accueil" class="icone-filtre">
             </a>
-        </button>
+        </nav>
     </header>
 
-    <main>
-        <section class="trouver-discipline">
-            <h1>Trouver le master qui me correspond</h1>            
+    <main role="main">
+        <section class="trouver-discipline" aria-labelledby="titre-choix">
+            <h1 id="titre-choix">Trouver le master qui me correspond</h1>
+            
+            <div class="disciplines-grid">
+                
+                <a href="discipline2.html" class="discipline-link">
+                    <figure class="discipline-card">
+                        <img src="./images/mascotte-pluridisciplinaire-sciences.svg" class="discipline-visual" alt="" aria-hidden="true">
+                        <figcaption class="discipline-content">
+                            <h2>Sciences Pluridisciplinaires</h2>
+                            <p>Approche large et intégrée des sciences.</p>
+                        </figcaption>
+                    </figure>
+                </a>
 
-            <!-- Pluridisciplinaire sciences -->
-            <figure class="discipline-card">
-                <figcaption class="discipline-content">
-                    <h2>Pluridisciplinaire sciences :</h2>
-                    <p>Combine plusieurs domaines scientifiques pour une approche large et intégrée.</p>
-                </figcaption>
-                <img src="./images/mascotte-pluridisciplinaire-sciences.svg" class="discipline-visual" alt="mascotte">
-            </figure>
+                <a href="discipline2.html" class="discipline-link">
+                    <figure class="discipline-card">
+                        <img src="./images/mascotte-pluridisciplinaire-lettres-langues-sciences-humaines.svg" class="discipline-visual" alt="" aria-hidden="true">
+                        <figcaption class="discipline-content">
+                            <h2>Lettres & Sciences Humaines</h2>
+                            <p>Littérature, linguistique et société.</p>
+                        </figcaption>
+                    </figure>
+                </a>
 
-            <!-- Pluridisciplinaire lettres langues sciences humaines -->
-            <figure class="discipline-card layout-inverse">
-                <figcaption class="discipline-content">
-                    <h2>Lettres Langues scicences humaines :</h2>
-                    <p>Mélange études littéraires, linguistiques et sciences humaines.</p>
-                </figcaption>
-                <img src="./images/mascotte-pluridisciplinaire-lettres-langues-sciences-humaines.svg" class="discipline-visual" alt="mascotte">
-            </figure>
+                <a href="discipline2.html" class="discipline-link">
+                    <figure class="discipline-card">
+                        <img src="./images/mascotte-science-fondamentales-application.svg" class="discipline-visual" alt="" aria-hidden="true">
+                        <figcaption class="discipline-content">
+                            <h2>Sciences Fondamentales</h2>
+                            <p>Recherche et applications technologiques.</p>
+                        </figcaption>
+                    </figure>
+                </a>
 
+                <a href="discipline2.html" class="discipline-link">
+                    <figure class="discipline-card">
+                        <img src="./images/mascotte-sciences-economique-gestion.svg" class="discipline-visual" alt="" aria-hidden="true">
+                        <figcaption class="discipline-content">
+                            <h2>Économie & Gestion</h2>
+                            <p>Finance, management et organisations.</p>
+                        </figcaption>
+                    </figure>
+                </a>
 
-            <!-- Sciences fondamentales et applications -->
-            <figure class="discipline-card">
-                <figcaption class="discipline-content">
-                    <h2>Sciences fondamentales applications :</h2>
-                    <p>Regroupe les disciplines scientifiques de base et leurs applications technologiques.</p>
-                </figcaption>
-                <img src="./images/mascotte-science-fondamentales-application.svg" class="discipline-visual" alt="mascotte">
-            </figure>
+                <a href="discipline2.html" class="discipline-link">
+                    <figure class="discipline-card">
+                        <img src="./images/mascotte-pluridisciplinaire-droit-science-economique.svg" class="discipline-visual" alt="" aria-hidden="true">
+                        <figcaption class="discipline-content">
+                            <h2>Droit & Économie</h2>
+                            <p>Compréhension des enjeux juridiques et sociaux.</p>
+                        </figcaption>
+                    </figure>
+                </a>
 
-            <!-- Sciences économiques et gestion -->
-            <figure class="discipline-card layout-inverse">
-                <figcaption class="discipline-content">
-                    <h2>Sciences économique et gestion :</h2>
-                    <p>Analyse la production, la distribution des richesses et le fonctionnement des organisations.</p>
-                </figcaption>
-                <img src="./images/mascotte-sciences-economique-gestion.svg" class="discipline-visual" alt="mascotte">
-            </figure>
+                <a href="discipline2.html" class="discipline-link">
+                    <figure class="discipline-card">
+                        <img src="./images/mascotte-staps.svg" class="discipline-visual" alt="" aria-hidden="true">
+                        <figcaption class="discipline-content">
+                            <h2>STAPS</h2>
+                            <p>Sciences et techniques des activités physiques.</p>
+                        </figcaption>
+                    </figure>
+                </a>
 
-            <!-- Pluridisciplinaire droit sciences économiques -->
-            <figure class="discipline-card">
-                <figcaption class="discipline-content">
-                    <h2>Science fondamentales application :</h2>
-                    <p>Associe les bases du droit et les principes de l’économie pour une compréhension globale des enjeux sociaux.</p>
-                </figcaption>
-                <img src="./images/mascotte-science-fondamentales-application.svg" class="discipline-visual" alt="mascotte">
-            </figure>
+                <a href="discipline2.html" class="discipline-link">
+                    <figure class="discipline-card">
+                        <img src="./images/mascotte-svt.svg" class="discipline-visual" alt="" aria-hidden="true">
+                        <figcaption class="discipline-content">
+                            <h2>SVT</h2>
+                            <p>Biologie, environnement et géologie.</p>
+                        </figcaption>
+                    </figure>
+                </a>
 
-            <!-- STAPS -->
-            <figure class="discipline-card layout-inverse">
-                <figcaption class="discipline-content">
-                    <h2>Staps :</h2>
-                    <p>Explore le sport, le mouvement humain et leurs applications scientifiques et professionnelles.</p>
-                </figcaption>
-                <img src="./images/mascotte-staps.svg" class="discipline-visual" alt="mascotte">
-            </figure>
+                <a href="discipline2.html" class="discipline-link">
+                    <figure class="discipline-card">
+                        <img src="./images/mascotte-theologie.svg" class="discipline-visual" alt="" aria-hidden="true">
+                        <figcaption class="discipline-content">
+                            <h2>Théologie</h2>
+                            <p>Étude des religions et croyances.</p>
+                        </figcaption>
+                    </figure>
+                </a>
 
-
-            <!-- SVT -->
-            <figure class="discipline-card">
-                <figcaption class="discipline-content">
-                    <h2>Svt :</h2>
-                    <p>Étudie le vivant, l’environnement et le fonctionnement du corps humain.</p>
-                </figcaption>
-                <img src="./images/mascotte-svt.svg" class="discipline-visual" alt="mascotte">
-            </figure>
-
-            <!-- Théologie -->
-            <figure class="discipline-card layout-inverse">
-                <figcaption class="discipline-content">
-                    <h2>Theologie :</h2>
-                    <p>Analyse les religions, leurs textes, leurs pratiques et leurs croyances.</p>
-                </figcaption>
-                <img src="./images/mascotte-theologie.svg" class="discipline-visual" alt="mascotte">
-            </figure>
+            </div>
         </section>
-</main>
+    </main>
 
-    <footer>
+    <footer role="contentinfo">
         <div class="footer-content">
-            <img src="./images/mascotte-chill.png" alt="Logo MasterMind en pied de page">
-
-            <nav aria-label="Liens réseaux sociaux">
-                <a class="liens" href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
-                    <img src="./images/instagram_logo.svg" alt="Instagram">
-                </a>
-                <a class="liens" href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
-                    <img src="./images/facebook_logo.svg" alt="Facebook">
-                </a>
-                <a  class="liens"href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
-                    <img src="./images/linkedin_logo.svg" alt="Linkedin">
-                </a>
+            <img src="./images/mascotte-chill.png" alt="Logo MasterMind">
+            <nav aria-label="Réseaux sociaux" class="social-nav">
+                <a class="liens" href="https://www.instagram.com" target="_blank" aria-label="Instagram"><img src="./images/instagram_logo.svg" alt=""></a>
+                <a class="liens" href="https://www.facebook.com" target="_blank" aria-label="Facebook"><img src="./images/facebook_logo.svg" alt=""></a>
+                <a class="liens" href="https://www.linkedin.com" target="_blank" aria-label="LinkedIn"><img src="./images/linkedin_logo.svg" alt=""></a>
             </nav>
-
-
+            <p>© 2025 MMI Laval</p>
         </div>
-        <p>© 2025 MMI Laval</p>
     </footer>
 </body>
-
+</html>

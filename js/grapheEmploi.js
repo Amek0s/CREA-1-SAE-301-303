@@ -1,92 +1,3 @@
-/* var dom = document.querySelector('.grapheEmploi');
-var myChart = echarts.init(dom, null, {
-    renderer: 'canvas',
-    useDirtyRect: false
-});
-var app = {};
-
-
-const option = {
-
-    textStyle: {
-        fontFamily: 'Readex Pro',
-        fontWeight: '500',
-        fontSize: 10
-    },
-    title: {
-        left: 'center',
-        textStyle: {
-            fontFamily: 'Readex Pro',
-            fontSize: 20,
-            fontWeight: 'bold',
-            color: '#333'
-        },
-        subtextStyle: {
-            fontFamily: 'Readex Pro',
-            fontSize: 14,
-            fontWeight: 'bold',
-            color: '#666'
-        }
-    },
-    tooltip: {
-        trigger: 'item',
-        textStyle: {
-            fontFamily: 'Readex Pro',
-            fontSize: 13,
-            fontWeight: 'bold'
-        }
-    },
-    legend: {
-        orient: 'vertical',
-        left: 'left',
-        textStyle: {
-            fontFamily: 'Readex Pro',
-            fontSize: 14,
-            fontWeight: 'bold',
-            color: '#444'
-        }
-    },
-    series: [
-        {
-            name: 'Access From',
-            type: 'pie',
-            radius: '50%',
-            label: {
-                show: true,
-                formatter: '{b}: {c}',
-                fontFamily: 'Readex Pro',
-                fontSize: 13,
-                fontWeight: 'bold',
-                color: '#000'
-            },
-            data: [
-                { value: 800, name: 'Emplois cadre', itemStyle: { color: '#F5E11B' } },
-                { value: 550, name: 'Emplois stables', itemStyle: { color: '#1BCDF5' } },
-                { value: 700, name: 'Emplois à temps plein', itemStyle: { color: '#D60C57' } },
-            ],
-            emphasis: {
-                itemStyle: {
-                    shadowBlur: 10,
-                    shadowOffsetX: 0,
-                    shadowColor: 'rgba(0, 0, 0, 0.5)'
-                }
-            }
-        }
-    ]
-};
-
-if (option && typeof option === 'object') {
-    myChart.setOption(option);
-}
-
-window.addEventListener('resize', myChart.resize);
-
-
-
-// Mise en place de l'option (dessin de la viz) c
-myChart.setOption(option);
-*/
-
 let myChart;
 
 export function initGrapheEmploi() {
@@ -102,67 +13,57 @@ export function initGrapheEmploi() {
         textStyle: {
             fontFamily: 'Readex Pro',
             fontWeight: '500',
-            fontSize: 10
-        },
-        title: {
-            left: 'center',
-            textStyle: {
-                fontFamily: 'Readex Pro',
-                fontSize: 20,
-                fontWeight: 'bold',
-                color: '#333'
-            },
-            subtextStyle: {
-                fontFamily: 'Readex Pro',
-                fontSize: 14,
-                fontWeight: 'bold',
-                color: '#666'
-            }
+            fontSize: 14
         },
         tooltip: {
             trigger: 'item',
-            textStyle: {
-                fontFamily: 'Readex Pro',
-                fontSize: 13,
-                fontWeight: 'bold'
-            }
+            formatter: '{b}: {c} ({d}%)' // Ajout du pourcentage au survol
         },
         legend: {
-            orient: 'vertical',
-            left: 'left',
+            orient: 'horizontal',
+            bottom: '0',
+            left: 'center',
             textStyle: {
                 fontFamily: 'Readex Pro',
-                fontSize: 14,
-                fontWeight: 'bold',
-                color: '#444'
-            }
+                fontSize: 12,
+                color: '#2D1A22'
+            },
+            itemWidth: 12,
+            itemHeight: 12
         },
         series: [
             {
-                name: 'Access From',
+                name: 'Type d\'emploi',
                 type: 'pie',
-                radius: '50%',
-                label: {
-                    show: true,
-                    formatter: '{b}: {c}',
-                    fontFamily: 'Readex Pro',
-                    fontSize: 13,
-                    fontWeight: 'bold',
-                    color: '#000'
+                radius: ['40%', '70%'], // Donut chart pour un look plus moderne
+                center: ['50%', '45%'],
+                avoidLabelOverlap: true,
+                itemStyle: {
+                    borderRadius: 5,
+                    borderColor: '#fff',
+                    borderWidth: 2
                 },
-                // Données initiales
-                data: [
-                    { value: 0, name: 'Emplois cadre', itemStyle: { color: '#F5E11B' } },
-                    { value: 0, name: 'Emplois stables', itemStyle: { color: '#1BCDF5' } },
-                    { value: 0, name: 'Emplois à temps plein', itemStyle: { color: '#D60C57' } },
-                ],
+                label: {
+                    show: false, // On masque les labels sur le graphe pour éviter le chevauchement
+                    position: 'center'
+                },
                 emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: 16,
+                        fontWeight: 'bold'
+                    },
                     itemStyle: {
                         shadowBlur: 10,
                         shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        shadowColor: 'rgba(0, 0, 0, 0.1)'
                     }
-                }
+                },
+                data: [
+                    { value: 0, name: 'Cadres', itemStyle: { color: '#F5E11B' } },
+                    { value: 0, name: 'Stables', itemStyle: { color: '#1BCDF5' } },
+                    { value: 0, name: 'Temps plein', itemStyle: { color: '#E6136A' } },
+                ]
             }
         ]
     };
@@ -177,11 +78,10 @@ export function initGrapheEmploi() {
 export function updateGrapheEmploi(data) {
     if (!myChart || !data) return;
 
-    // Mise à jour en gardant VOS couleurs et libellés
     const newData = [
-        { value: data.nb_cadres || 0, name: 'Emplois cadre', itemStyle: { color: '#F5E11B' } },
-        { value: data.nb_stable || 0, name: 'Emplois stables', itemStyle: { color: '#1BCDF5' } },
-        { value: data.nb_temps_plein || 0, name: 'Emplois à temps plein', itemStyle: { color: '#D60C57' } },
+        { value: data.nb_cadres || 0, name: 'Cadres', itemStyle: { color: '#F5E11B' } },
+        { value: data.nb_stable || 0, name: 'Stables', itemStyle: { color: '#1BCDF5' } },
+        { value: data.nb_temps_plein || 0, name: 'Temps plein', itemStyle: { color: '#E6136A' } },
     ];
 
     myChart.setOption({

@@ -2,73 +2,56 @@
 <html lang="fr">
 
 <head>
-    <title>MasterMind - Ton master bien pensé !</title>
-    <meta name="description" content="Trouvez le master de vos rêves avec MasterMind">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-    <meta name="description" content="Trouvez un master en fonction de vos passions et compétences">
+    <title>MasterMind - Choisir un Master</title>
+    <meta name="description" content="Liste des masters disponibles dans cette discipline.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Paytone+One&family=Readex+Pro:wght@160..700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Paytone+One&family=Readex+Pro:wght@160..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css" type="text/css">
-    <link rel="icon" href="./images/mascotte-chill.png" type="image/w-icon">
-
-    <script src="https://fastly.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-    <!--NORMALEMENT ON A PAS BESOIN DE RELIER AVEC SCRIPT C'EST ORCHESTRATOR QUI GERE-->
-   <!-- <script src="./js/grapheEmploi.js" defer></script>
-    <script src="./js/grapheSalaire.js" defer></script>
-    <script src="./js/grapheAdmission.js" defer></script> -->
-    <script type="module" src="./js/orchestrator.js"></script>
-
+    <link rel="icon" href="./images/mascotte-chill.png" type="image/png">
 </head>
 
 <body>
-    <header>
-        <img src="./images/logo-v2.svg" class="logo-header" alt="Mascotte MasterMind">
-        <button class="btn-menu">
-            <a href="index.html" class="btn-menu">
-                <img src="./images/icone_maison.svg" alt="Ouvrir le filtre" class="icone-filtre">
+    <header role="banner">
+        <img src="./images/logo-v2.svg" class="logo-header" alt="Logo MasterMind">
+        <nav role="navigation" aria-label="Menu principal">
+            <a href="discipline.html" class="btn-menu" aria-label="Retour aux disciplines">
+                <img src="./images/filtre.svg" alt="Retour" class="icone-filtre">
             </a>
-        </button>
+        </nav>
     </header>
 
-    <main>
-        <section class="trouver-discipline">
-            <h1>Trouver le master qui me correspond</h1>
+    <main role="main">
+        <section class="trouver-discipline" aria-labelledby="titre-master">
+            <h1 id="titre-master">Choisir mon Master</h1>
+            
+            <p class="subtitle">Sélectionnez une formation pour voir les détails</p>
+
             <div class="boiteNomMaster">
-                <p class="nomMaster">Nom du master</p>
-                <p class="nomMaster">Nom du master</p>
-                <p class="nomMaster">Nom du master</p>
-                <p class="nomMaster">Nom du master</p>
-                <p class="nomMaster">Nom du master</p>
-                <p class="nomMaster">Nom du master</p>
-                <p class="nomMaster">Nom du master</p>
-                <p class="nomMaster">Nom du master</p>
+                <a href="index.html" class="nomMaster" role="button">Master Droit des affaires</a>
+                <a href="index.html" class="nomMaster" role="button">Master Droit public</a>
+                <a href="index.html" class="nomMaster" role="button">Master Droit notarial</a>
+                <a href="index.html" class="nomMaster" role="button">Master Droit du numérique</a>
+                <a href="index.html" class="nomMaster" role="button">Master Science Politique</a>
+                <a href="index.html" class="nomMaster" role="button">Master Économie appliquée</a>
+                <a href="index.html" class="nomMaster" role="button">Master Justice et procès</a>
+                <a href="index.html" class="nomMaster" role="button">Master Droit social</a>
             </div>
         </section>
-</main>
+    </main>
 
-    <footer>
+    <footer role="contentinfo">
         <div class="footer-content">
-            <img src="./images/mascotte-chill.png" alt="Logo MasterMind en pied de page">
-
-            <nav aria-label="Liens réseaux sociaux">
-                <a class="liens" href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
-                    <img src="./images/instagram_logo.svg" alt="Instagram">
-                </a>
-                <a class="liens" href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
-                    <img src="./images/facebook_logo.svg" alt="Facebook">
-                </a>
-                <a  class="liens"href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
-                    <img src="./images/linkedin_logo.svg" alt="Linkedin">
-                </a>
+            <img src="./images/mascotte-chill.png" alt="Logo MasterMind">
+            <nav aria-label="Réseaux sociaux" class="social-nav">
+                <a class="liens" href="https://www.instagram.com" target="_blank" aria-label="Instagram"><img src="./images/instagram_logo.svg" alt=""></a>
+                <a class="liens" href="https://www.facebook.com" target="_blank" aria-label="Facebook"><img src="./images/facebook_logo.svg" alt=""></a>
+                <a class="liens" href="https://www.linkedin.com" target="_blank" aria-label="LinkedIn"><img src="./images/linkedin_logo.svg" alt=""></a>
             </nav>
-
-
+            <p>© 2025 MMI Laval</p>
         </div>
-        <p>© 2025 MMI Laval</p>
     </footer>
 </body>
-
+</html>

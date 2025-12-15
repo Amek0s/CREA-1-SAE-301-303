@@ -6,125 +6,142 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>MasterMind - Ton master bien pensé !</title>
-    <meta name="description" content="Trouvez le master de vos rêves avec MasterMind">
+    <meta name="description" content="Trouvez le master de vos rêves avec MasterMind : statistiques, débouchés et salaires.">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Paytone+One&family=Readex+Pro:wght@160..700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Paytone+One&family=Readex+Pro:wght@160..700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="./css/style.css" type="text/css">
-    <link rel="icon" href="./images/mascotte-chill.png" type="image/w-icon">
+    <link rel="icon" href="./images/mascotte-chill.png" type="image/png">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script src="https://fastly.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-    <!--NORMALEMENT ON A PAS BESOIN DE RELIER AVEC SCRIPT C'EST ORCHESTRATOR QUI GERE-->
-   <!-- <script src="./js/grapheEmploi.js" defer></script>
-    <script src="./js/grapheSalaire.js" defer></script>
-    <script src="./js/grapheAdmission.js" defer></script> -->
     <script type="module" src="./js/orchestrator.js"></script>
 
 </head>
 
 <body>
-    <header>
-        <img src="./images/logo-v2.svg" class="logo-header" alt="Mascotte MasterMind">
-        <button class="btn-menu">
-            <a href="discipline.html" class="btn-menu">
-                <img src="./images/filtre.svg" alt="Ouvrir le filtre" class="icone-filtre">
+    <header role="banner">
+        <img src="./images/logo-v2.svg" class="logo-header" alt="Logo MasterMind">
+        <nav role="navigation" aria-label="Menu principal">
+            <a href="discipline.html" class="btn-menu" aria-label="Retour au choix des disciplines">
+                <img src="./images/filtre.svg" alt="Icône filtre" class="icone-filtre">
             </a>
-        </button>
+        </nav>
     </header>
 
-    <main>
-        <section class="details-master">
-            <h1 id="disci_master"></h1>
-            <p id="parcours"></p>
+    <main role="main">
+        <section class="details-master" aria-labelledby="disci_master">
+            <h1 id="disci_master">Chargement...</h1>
+            <p id="parcours" class="subtitle">Parcours...</p>
         </section>
 
-        <section>
-            <img src="./images/chapeau.svg" class="chapeau" alt="">
-            <h3 class="title-border" id="nomEtab"></h3>
-            <div class="bloc">
-                <h2 class="key-info">Informations clés</h2>
-                <dl>
-                    <div class="bloc-p">
-                        <dt>Capacité d'accueil</dt>
-                        <strong><dd id="col"></dd></strong>
+        <section class="etablissement-section" aria-labelledby="nomEtab">
+            <img src="./images/chapeau.svg" class="chapeau" alt="" aria-hidden="true">
+            
+            <h2 class="title-border" id="nomEtab">Établissement</h2>
+
+            <div class="info-grid">
+                <article class="info-card">
+                    <div class="info-icon" aria-hidden="true">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
                     </div>
-                    <div class="bloc-p">
-                        <dt>Alternance possible</dt>
-                        <strong><dd id="alternance"></dd></strong>
+                    <h3 class="info-label">Capacité d'accueil</h3>
+                    <div class="info-pill">
+                        <span id="col">--</span>
                     </div>
-                </dl>
+                </article>
+
+                <article class="info-card">
+                    <div class="info-icon" aria-hidden="true">
+                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 21V5C16 4.46957 15.7893 3.96086 15.4142 3.58579C15.0391 3.21071 14.5304 3 14 3H10C9.46957 3 8.96086 3.21071 8.58579 3.58579C8.21071 3.96086 8 4.46957 8 5V21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="info-label">Alternance Possible</h3>
+                    <div class="info-pill">
+                        <span id="alternance">--</span>
+                    </div>
+                </article>
             </div>
-            <a href="https://monmaster.gouv.fr/" target="_blank" rel="noopener noreferrer" class="button">Site web de
-                l'établissement</a>
+
+            <div class="btn-container">
+                <a href="https://monmaster.gouv.fr/" target="_blank" rel="noopener noreferrer" class="button button-dark">
+                    Site web de l'établissement
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:8px;">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                </a>
+            </div>
         </section>
-
-
 
         <section class="section-stats" aria-labelledby="stats-title">
+            <h4 id="stats-title">QUELQUES CHIFFRES</h4>
             <div class="background-wave" aria-hidden="true"></div>
-
-            <h4>QUELQUES CHIFFRES</h4>
             <img src="./images/mascotte-droite.svg" class="stats-mascot" alt="" aria-hidden="true">
+            
             <figure class="stat-card">
                 <figcaption class="stat-content">
-                    <p>Salaires moyens à la sortie</p>
+                    <h2>Salaires moyens</h2>
+                    <p>Comparaison des salaires bruts, médians et nets à la sortie du diplôme.</p>
                 </figcaption>
                 <div class="stat-visual">
-                    <div id="ecartChart1" class="grapheSalaire chart-render" role="img"
-                        aria-label="Graphique des salaires"></div>
+                    <div id="ecartChart1" class="grapheSalaire chart-render"></div>
                 </div>
             </figure>
 
             <figure class="stat-card layout-inverse">
                 <div class="stat-visual">
-                    <div id="ecartChart3" class="grapheEmploi chart-render" role="img"
-                        aria-label="Graphique répartition emplois"></div>
+                    <div id="ecartChart3" class="grapheEmploi chart-render"></div>
                 </div>
                 <figcaption class="stat-content">
-                    <p>Les types d'emplois après le master</p>
+                    <h2>Types d'emplois</h2>
+                    <p>Répartition des contrats obtenus par les diplômés (Cadres, Stable, Temps plein).</p>
                 </figcaption>
             </figure>
 
             <figure class="stat-card">
                 <figcaption class="stat-content">
-                    <p>Taux d'admission, taux d'insertion, taux d'emploi</p>
+                    <h2>Taux de réussite</h2>
+                    <p>Pourcentages d'admission en M1, d'insertion professionnelle et d'emploi salarié.</p>
                 </figcaption>
                 <div class="stat-visual">
-                    <div id="ecartChart2" class="grapheAdmission chart-render" role="img"
-                        aria-label="Graphique des taux"></div>
+                    <div id="ecartChart2" class="grapheAdmission chart-render"></div>
                 </div>
             </figure>
         </section>
 
-        <section class="location-section">
-            <h4>LIEU DE LA FORMATION</h4>
-            <!-- CARTE -->
-            <p>adresse</p>
+        <section class="location-section" aria-labelledby="map-title">
+            <h4 id="map-title">LIEU DE LA FORMATION</h4>
+            
+            <div class="map-container">
+                <div id="osm-map"></div>
+            </div>
         </section>
-
-
-      
     </main>
 
-    <footer>
+    <footer role="contentinfo">
         <div class="footer-content">
-            <img src="./images/mascotte-chill.png" alt="Logo MasterMind en pied de page">
-
-            <nav aria-label="Liens réseaux sociaux">
-                <a class="liens" href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
-                    <img src="./images/social/instagram.svg" alt="Instagram">
-                </a>
-                <a class="liens" href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
-                    <img src="./images/social/facebook.svg" alt="Facebook">
-                </a>
-                <a class="liens" href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
-                    <img src="./images/social/linkedin.svg" alt="Linkedin">
-                </a>
+            <img src="./images/mascotte-chill.png" alt="Logo MasterMind">
+            <nav aria-label="Réseaux sociaux" class="social-nav">
+                <a class="liens" href="https://www.instagram.com" target="_blank" aria-label="Instagram"><img src="./images/instagram_logo.svg" alt=""></a>
+                <a class="liens" href="https://www.facebook.com" target="_blank" aria-label="Facebook"><img src="./images/facebook_logo.svg" alt=""></a>
+                <a class="liens" href="https://www.linkedin.com" target="_blank" aria-label="LinkedIn"><img src="./images/linkedin_logo.svg" alt=""></a>
             </nav>
-
-
+            <p>© 2025 MasterMind - SAE 301/303</p>
         </div>
     </footer>
     <script src="./js/filtre.js"></script>
 </body>
+</html>

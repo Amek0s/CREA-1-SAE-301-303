@@ -8,45 +8,107 @@ import { initGrapheSalaire, updateGrapheSalaire } from "./grapheSalaire.js";
 import { initGrapheEmploi, updateGrapheEmploi } from "./grapheEmploi.js"; 
 import { initGrapheAdmission, updateGrapheAdmission } from "./grapheAdmission.js"; 
 
+// --- VARIABLES GLOBALES POUR LA MAP ---
+let map = null;
+let marker = null;
+
 // --- FONCTIONS ---
 
 function updateTextElements(details, stats) {
     if (!details) return;
     
-    // On prend la première candidature (car filtré par IFC, il n'y en a qu'une ou deux)
     const cand = (stats && stats.candidatures && stats.candidatures.length > 0) 
                  ? stats.candidatures[0].general 
                  : {};
 
-    document.getElementById('disci_master').textContent = "Master " + (details.mention || "Inconnu");
-    document.getElementById('parcours').textContent = details.parcours || "";
-    document.getElementById('nomEtab').textContent = details.etablissement || "";
-    document.getElementById('alternance').textContent = details.alternance ? "Oui" : "Non";
+    const mention = details.mention || "Information non disponible";
+    const parcours = details.parcours || "";
+    const etablissement = details.etablissement || "Établissement inconnu";
+
+    document.getElementById('disci_master').textContent = "Master " + mention;
+    document.getElementById('parcours').textContent = parcours;
+    document.getElementById('nomEtab').textContent = etablissement;
+    
+    const isAlternance = details.alternance || (details.modalites && details.modalites.includes('apprentissage'));
+    document.getElementById('alternance').textContent = isAlternance ? "Oui" : "Non";
+    
     document.getElementById('col').textContent = cand.capacite || "N/A";
 }
 
+/**
+ * Initialise ou met à jour la carte OpenStreetMap (Leaflet).
+ * Utilise l'API Nominatim pour convertir l'adresse en coordonnées GPS.
+ */
+async function updateMapOpenSource(details) {
+    if (!details) return;
+
+    // 1. Initialisation de la carte si elle n'existe pas encore
+    if (!map) {
+        // Coordonnées par défaut (France) avant chargement
+        map = L.map('osm-map').setView([46.603354, 1.888334], 6);
+
+        // Ajout des tuiles (le design de la carte) - Ici OpenStreetMap classique
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+    }
+
+    // 2. Construction de la requête de géocodage
+    const etablissement = details.etablissement || "";
+    const ville = details.ville || "";
+    const cp = details.codePostal || "";
+    
+    // On construit une requête précise (ex: "Université de Rennes 1 Rennes 35000")
+    const query = `${etablissement} ${ville} ${cp}`.trim();
+    
+    if (query.length === 0) return;
+
+    console.log(`🌍 Recherche GPS pour : ${query}`);
+
+    try {
+        // 3. Appel à l'API de géocodage Nominatim (OpenStreetMap)
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
+        const response = await fetch(url);
+        const results = await response.json();
+
+        if (results && results.length > 0) {
+            const lat = results[0].lat;
+            const lon = results[0].lon;
+            
+            console.log(`📍 Coordonnées trouvées : ${lat}, ${lon}`);
+
+            // 4. Mise à jour de la vue et du marqueur
+            map.setView([lat, lon], 15); // Zoom 15 (niveau rue)
+
+            // Gestion du marqueur (on supprime l'ancien s'il existe)
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            marker = L.marker([lat, lon]).addTo(map)
+                .bindPopup(`<b>${etablissement}</b><br>${ville}`)
+                .openPopup();
+        } else {
+            console.warn("Aucun résultat GPS trouvé pour cette adresse.");
+        }
+    } catch (error) {
+        console.error("Erreur lors du géocodage :", error);
+    }
+}
+
 function formatDataForCharts(stats, secDiscIdVise) {
-    // 1. ADMISSION
     const cand = (stats.candidatures && stats.candidatures.length > 0) 
                  ? stats.candidatures[0].general 
                  : { nb: 0, accept: 0 };
 
-    // 2. INSERTION PRO
     let insert = {};
     
     if (stats.insertionsPro && stats.insertionsPro.length > 0) {
-        // A. On cherche la correspondance exacte avec le secteur disciplinaire
         const statTrouvee = stats.insertionsPro.find(s => 
             s.relations && s.relations.secDiscIds && s.relations.secDiscIds.includes(secDiscIdVise)
         );
-
-        if (statTrouvee) {
-            console.log("Données précises trouvées (Secteur Disc.)");
-            insert = statTrouvee;
-        } else {
-            console.warn("Pas de correspondance exacte, utilisation de la moyenne établissement.");
-            insert = stats.insertionsPro[0];
-        }
+        insert = statTrouvee || stats.insertionsPro[0];
     }
 
     const gen = insert.general || {};
@@ -57,7 +119,7 @@ function formatDataForCharts(stats, secDiscIdVise) {
     const salaireMensuel = sal.netMedianTempsPlein || 0;
 
     return {
-        pct_accept_master: tauxAdm,
+        pct_accept_master: Math.round(tauxAdm),
         taux_insert_18m: gen.tauxInsertion || 0,
         taux_emploi_18m: gen.tauxEmploi || 0,
         salaire_brut: sal.brutAnnuelEstime || 0,
@@ -72,34 +134,33 @@ function formatDataForCharts(stats, secDiscIdVise) {
 // --- MAIN ---
 
 async function main() {
-    initGrapheSalaire(); initGrapheEmploi(); initGrapheAdmission();
+    initGrapheSalaire(); 
+    initGrapheEmploi(); 
+    initGrapheAdmission();
 
-    console.log(`Démarrage pour IFC : ${IFC_ACTUEL}`);
+    console.log(`🚀 Démarrage MasterMind pour IFC : ${IFC_ACTUEL}`);
 
     let data = loadStatsFromCache();
     
-    // Invalidation si changement d'IFC
     if (data && data.ifc !== IFC_ACTUEL) {
-        console.log("Nouvel IFC détecté, nettoyage du cache...");
+        console.log("🔄 Nouvel IFC détecté, rechargement des données...");
         data = null; 
     }
 
     if (!data) {
-        console.log("Appel API en cours...");
+        console.log("📡 Appel API en cours...");
         
         const details = await getFormationDetails(IFC_ACTUEL);
 
         if (details) {
-            // Récupération sécurisée de l'UAI
             const uai = details.etabUai || details.uai; 
             const secDiscId = details.secDiscId || details.secteurDisciplinaireId;
 
             if (!uai) {
-                console.error("Impossible de trouver l'UAI de cet établissement !");
+                console.error("❌ Impossible de trouver l'UAI !");
                 return;
             }
 
-            // Appel avec les identifiants
             const stats = await getStatsForMaster(IFC_ACTUEL, uai);
 
             if (stats) {
@@ -113,11 +174,15 @@ async function main() {
             }
         }
     } else {
-        console.log("Données chargées du cache.");
+        console.log("✅ Données chargées depuis le cache.");
     }
 
     if (data && data.formatted) {
         updateTextElements(data.details, data.statsRaw);
+        
+        // --- NOUVEL APPEL POUR LA CARTE OPEN SOURCE ---
+        updateMapOpenSource(data.details);
+        
         updateGrapheSalaire(data.formatted);
         updateGrapheEmploi(data.formatted);
         updateGrapheAdmission(data.formatted);
