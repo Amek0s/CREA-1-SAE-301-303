@@ -1,8 +1,5 @@
 const URL_BASE_API = 'https://la-lab4ce.univ-lemans.fr/masters-stats/api/rest';
 
-/**
- * Récupère les détails d'une formation (Page Accueil)
- */
 export async function getFormationDetails(ifc) {
     try {
         const url = `${URL_BASE_API}/formations/${ifc}?full-details=1`;
@@ -15,9 +12,6 @@ export async function getFormationDetails(ifc) {
     }
 }
 
-/**
- * Récupère la liste des secteurs disciplinaires (Page Discipline)
- */
 export async function getSecteursDisciplinaires() {
     try {
         const url = `${URL_BASE_API}/secteurs-disciplinaires`;
@@ -30,9 +24,6 @@ export async function getSecteursDisciplinaires() {
     }
 }
 
-/**
- * Récupère les formations d'un secteur (Page Discipline 2)
- */
 export async function getFormationsBySecteur(sdid) {
     try {
         const url = `${URL_BASE_API}/formations?sdid=${sdid}&full-details=1`;
@@ -47,38 +38,40 @@ export async function getFormationsBySecteur(sdid) {
 }
 
 /**
- * Récupère les statistiques complètes.
- * CORRECTION : On utilise l'IFC pour les candidatures, 
- * MAIS on utilise l'UAI et le Secteur pour l'insertion (car l'IFC ne marche pas pour ça).
+ * Récupère les stats avec Fallback (Sécurité).
+ * Si les stats d'insertion du master sont vides, on prend celles de l'établissement.
  */
 export async function getStatsForMaster(ifc, uai, secDiscId) {
     try {
-        // 1. CANDIDATURES (Basé sur l'IFC)
+        // 1. CANDIDATURES (Toujours fiable via IFC)
         const reqCand = fetch(`${URL_BASE_API}/stats/search`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                "filters": { "formationIfcs": [ifc] },
+                "filters": { 
+                    "formationIfcs": [ifc],
+                    "anneeMin": 2021
+                },
                 "harvest": { "typeStats": "candidatures", "candidatureDetails": ["general"] }
             })
         }).then(r => r.ok ? r.json() : { candidatures: [] });
 
-        // 2. INSERTION PRO (Basé sur Etablissement + Secteur)
-        // On construit le filtre dynamiquement
-        const filtersInsert = {
+        // 2. INSERTION - TENTATIVE 1 (Précise : UAI + Secteur)
+        const filtersPrecise = {
             "etablissementIds": [uai],
-            "moisApresDiplome": 30
+            "moisApresDiplome": 30,
+            "anneeMin": 2019
         };
-        // On ajoute le secteur seulement s'il est défini, pour affiner
+        // On filtre par secteur si disponible
         if (secDiscId) {
-            filtersInsert.secteurDisciplinaireIds = [parseInt(secDiscId)];
+            filtersPrecise.secteurDisciplinaireIds = [parseInt(secDiscId)];
         }
 
-        const reqInsert = fetch(`${URL_BASE_API}/stats/search`, {
+        const reqInsertPrecise = fetch(`${URL_BASE_API}/stats/search`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                "filters": filtersInsert,
+                "filters": filtersPrecise,
                 "harvest": {
                     "typeStats": "insertionsPro",
                     "insertionProDetails": ["general", "salaire", "emplois"]
@@ -86,14 +79,46 @@ export async function getStatsForMaster(ifc, uai, secDiscId) {
             })
         }).then(r => r.ok ? r.json() : { insertionsPro: [] });
 
-        const [cand, insert] = await Promise.all([reqCand, reqInsert]);
+        let [candData, insertData] = await Promise.all([reqCand, reqInsertPrecise]);
+        let sourceInsertion = 'precis';
+
+        // 3. INSERTION - TENTATIVE 2 (Fallback : Etablissement seul)
+        // Si la tentative précise est vide, on prend la moyenne de l'établissement
+        if (!insertData.insertionsPro || insertData.insertionsPro.length === 0) {
+            console.warn("⚠️ Données précises manquantes, passage en moyenne établissement.");
+            const reqInsertGlobal = await fetch(`${URL_BASE_API}/stats/search`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    "filters": { 
+                        "etablissementIds": [uai],
+                        "moisApresDiplome": 30,
+                        "anneeMin": 2019
+                    },
+                    "harvest": {
+                        "typeStats": "insertionsPro",
+                        "insertionProDetails": ["general", "salaire", "emplois"]
+                    }
+                })
+            });
+            
+            if (reqInsertGlobal.ok) {
+                const fallbackData = await reqInsertGlobal.json();
+                if (fallbackData.insertionsPro && fallbackData.insertionsPro.length > 0) {
+                    insertData = fallbackData;
+                    sourceInsertion = 'etablissement_global';
+                }
+            }
+        }
 
         return {
-            candidatures: cand.candidatures || [],
-            insertionsPro: insert.insertionsPro || []
+            candidatures: candData.candidatures || [],
+            insertionsPro: insertData.insertionsPro || [],
+            sourceInsertion: sourceInsertion
         };
+
     } catch (e) {
         console.error("Erreur stats :", e);
-        return { candidatures: [], insertionsPro: [] };
+        return { candidatures: [], insertionsPro: [], sourceInsertion: 'erreur' };
     }
 }

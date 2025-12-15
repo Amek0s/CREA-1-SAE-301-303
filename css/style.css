@@ -7,18 +7,22 @@
     --bg-card: #FFFFFF;
     --text-primary: #2D1A22;
     --text-secondary: #66585E;
-    
+
     --radius-l: 24px;
     --radius-m: 16px;
     --radius-s: 12px;
     --shadow-soft: 0 10px 30px rgba(230, 19, 106, 0.1);
-    
+
     --font-primary: 'Readex Pro', sans-serif;
     --font-title: 'Paytone One', sans-serif;
 }
 
 /* --- RESET & BASE --- */
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 body {
     font-family: var(--font-primary);
@@ -31,12 +35,25 @@ body {
     flex-direction: column;
 }
 
-a { text-decoration: none; color: inherit; transition: all 0.2s; }
-img { max-width: 100%; height: auto; display: block; }
-button { font-family: inherit; }
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+button {
+    font-family: inherit;
+}
 
 /* Accessibilité : Focus visible */
-button:focus-visible, a:focus-visible {
+button:focus-visible,
+a:focus-visible {
     outline: 3px solid var(--text-primary);
     outline-offset: 4px;
 }
@@ -85,12 +102,23 @@ header {
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-.logo-header { width: 140px; }
-.btn-menu { background: none; border: none; cursor: pointer; }
-.icone-filtre { width: 32px; height: 32px; }
+.logo-header {
+    width: 140px;
+}
+
+.btn-menu {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.icone-filtre {
+    width: 32px;
+    height: 32px;
+}
 
 /* --- COMPOSANTS GÉNÉRAUX --- */
 
@@ -149,7 +177,10 @@ header {
 }
 
 @media (min-width: 768px) {
-    .info-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .info-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
 }
 
 .info-card {
@@ -166,7 +197,9 @@ header {
     height: 100%;
 }
 
-.info-icon { margin-bottom: 1rem; }
+.info-icon {
+    margin-bottom: 1rem;
+}
 
 .info-label {
     font-family: var(--font-title);
@@ -213,9 +246,20 @@ header {
     gap: 2rem;
 }
 
-.stat-content { text-align: center; }
-.stat-visual { width: 100%; min-height: 350px; }
-.chart-render { width: 100%; height: 100%; min-height: 350px; }
+.stat-content {
+    text-align: center;
+}
+
+.stat-visual {
+    width: 100%;
+    min-height: 350px;
+}
+
+.chart-render {
+    width: 100%;
+    height: 100%;
+    min-height: 350px;
+}
 
 @media (min-width: 900px) {
     .stat-card {
@@ -224,9 +268,19 @@ header {
         padding: 3rem;
         text-align: left;
     }
-    .stat-card.layout-inverse { flex-direction: row-reverse; }
-    .stat-content { flex: 1; text-align: left; }
-    .stat-visual { flex: 1.5; }
+
+    .stat-card.layout-inverse {
+        flex-direction: row-reverse;
+    }
+
+    .stat-content {
+        flex: 1;
+        text-align: left;
+    }
+
+    .stat-visual {
+        flex: 1.5;
+    }
 }
 
 /* --- PAGE ACCUEIL : MAP OPEN SOURCE --- */
@@ -241,12 +295,13 @@ header {
     padding: 10px;
     border-radius: var(--radius-l);
     box-shadow: var(--shadow-soft);
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 /* Style spécifique pour Leaflet */
 #osm-map {
-    height: 450px; /* Hauteur obligatoire */
+    height: 450px;
+    /* Hauteur obligatoire */
     width: 100%;
     border-radius: var(--radius-m);
     z-index: 1;
@@ -254,7 +309,10 @@ header {
 
 /* --- PAGE DISCIPLINES (discipline.html & discipline2.html) --- */
 
-main { padding: 0 1rem; flex: 1; }
+main {
+    padding: 0 1rem;
+    flex: 1;
+}
 
 .trouver-discipline {
     padding: 2rem 1rem;
@@ -271,11 +329,15 @@ main { padding: 0 1rem; flex: 1; }
 }
 
 @media (min-width: 600px) {
-    .disciplines-grid { grid-template-columns: repeat(2, 1fr); }
+    .disciplines-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (min-width: 992px) {
-    .disciplines-grid { grid-template-columns: repeat(3, 1fr); }
+    .disciplines-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 /* Carte de discipline individuelle */
@@ -289,9 +351,11 @@ main { padding: 0 1rem; flex: 1; }
     align-items: center;
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    height: 100%; /* Uniformise la hauteur */
+    height: 100%;
+    /* Uniformise la hauteur */
     border: 2px solid transparent;
-    cursor: pointer; /* Indique que c'est cliquable */
+    cursor: pointer;
+    /* Indique que c'est cliquable */
 }
 
 .discipline-card:hover {
@@ -306,9 +370,21 @@ main { padding: 0 1rem; flex: 1; }
     height: 100%;
 }
 
-.discipline-content { order: 2; margin-top: 1.5rem; }
-.discipline-content h2 { font-size: 1.3rem; color: var(--main-color); margin-bottom: 0.5rem; }
-.discipline-content p { font-size: 0.95rem; line-height: 1.5; }
+.discipline-content {
+    order: 2;
+    margin-top: 1.5rem;
+}
+
+.discipline-content h2 {
+    font-size: 1.3rem;
+    color: var(--main-color);
+    margin-bottom: 0.5rem;
+}
+
+.discipline-content p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
 
 .discipline-visual {
     order: 1;
@@ -328,7 +404,9 @@ main { padding: 0 1rem; flex: 1; }
 }
 
 @media (min-width: 768px) {
-    .boiteNomMaster { grid-template-columns: 1fr 1fr; }
+    .boiteNomMaster {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
 /* Style des "boutons" Master */
@@ -344,7 +422,8 @@ main { padding: 0 1rem; flex: 1; }
     border: 2px solid transparent;
     cursor: pointer;
     font-size: 1.1rem;
-    display: flex;           /* Flex pour centrer le texte si multi-lignes */
+    display: flex;
+    /* Flex pour centrer le texte si multi-lignes */
     align-items: center;
     justify-content: center;
     min-height: 80px;
@@ -360,7 +439,10 @@ main { padding: 0 1rem; flex: 1; }
 /* --- DÉCORATIONS --- */
 .background-wave {
     position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-image: url('../images/pinkWave.svg');
     background-repeat: no-repeat;
     background-size: cover;
@@ -370,22 +452,30 @@ main { padding: 0 1rem; flex: 1; }
 
 .chapeau {
     position: absolute;
-    right: 5%; top: -20px;
+    right: 5%;
+    top: -20px;
     width: 5rem;
     transform: rotate(20deg);
     display: none;
 }
 
 @media (min-width: 768px) {
-    .chapeau { display: block; }
+    .chapeau {
+        display: block;
+    }
+
     .stats-mascot {
         position: absolute;
-        right: -2rem; top: 150px;
+        right: -2rem;
+        top: 150px;
         width: 7rem;
         display: block;
     }
 }
-.stats-mascot { display: none; }
+
+.stats-mascot {
+    display: none;
+}
 
 /* --- FOOTER --- */
 footer {
@@ -401,7 +491,21 @@ footer {
     align-items: center;
     gap: 1.5rem;
 }
-.footer-content img { width: 60px; }
-.social-nav { display: flex; gap: 1.5rem; }
-.social-nav img { width: 30px; transition: transform 0.2s; }
-.social-nav a:hover img { transform: scale(1.2); }
+
+.footer-content img {
+    width: 60px;
+}
+
+.social-nav {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.social-nav img {
+    width: 30px;
+    transition: transform 0.2s;
+}
+
+.social-nav a:hover img {
+    transform: scale(1.2);
+}

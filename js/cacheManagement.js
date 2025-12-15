@@ -1,8 +1,8 @@
-// Changement de version pour invalider le cache buggé précédent
-const MASTER_STATS_KEY = 'MASTER_STATS_DATA_V4'; 
+// Changement de version : V6 pour nettoyer les anciens tests
+const MASTER_STATS_KEY = 'MASTER_STATS_DATA_V6'; 
 
 const CACHE_DURATION = 1000 * 60 * 60; 
-const TIMESTAMP_KEY = 'MASTER_STATS_TIME_V4'; 
+const TIMESTAMP_KEY = 'MASTER_STATS_TIME_V6'; 
 
 let monStockage = window.localStorage;
 
