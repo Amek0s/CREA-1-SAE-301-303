@@ -13,7 +13,7 @@ export function initGrapheSalaire() {
         textStyle: {
             fontFamily: 'Readex Pro',
             fontWeight: 500,
-            fontSize: 14 // Augmenté pour l'accessibilité
+            fontSize: 14 
         },
         tooltip: {
             trigger: 'axis',
@@ -27,13 +27,13 @@ export function initGrapheSalaire() {
         },
         xAxis: {
             type: 'category',
-            data: ['Brut Annuel', 'Médian Annuel', 'Net Annuel'], // Labels raccourcis pour mobile
+            data: ['Brut Annuel', 'Médian Annuel', 'Net Annuel'],
             axisLabel: {
                 fontFamily: 'Readex Pro',
                 fontWeight: 500,
-                fontSize: 12, // Augmenté
+                fontSize: 12,
                 color: '#2D1A22',
-                interval: 0 // Force l'affichage de tous les labels
+                interval: 0 
             },
             axisLine: {
                 lineStyle: { color: '#66585E' }
@@ -49,7 +49,7 @@ export function initGrapheSalaire() {
             },
             splitLine: {
                 lineStyle: {
-                    color: '#FFE0E9', // Ligne grille plus douce
+                    color: '#FFE0E9',
                     type: 'dashed'
                 }
             }
@@ -61,7 +61,7 @@ export function initGrapheSalaire() {
                 data: [
                     { value: 0, itemStyle: { color: '#1BCDF5', borderRadius: [5, 5, 0, 0] } },
                     { value: 0, itemStyle: { color: '#F5E11B', borderRadius: [5, 5, 0, 0] } },
-                    { value: 0, itemStyle: { color: '#E6136A', borderRadius: [5, 5, 0, 0] } } // Couleur principale au lieu de D60C57
+                    { value: 0, itemStyle: { color: '#E6136A', borderRadius: [5, 5, 0, 0] } } 
                 ],
                 label: {
                     show: true,

@@ -1,5 +1,5 @@
 import { getSecteursDisciplinaires } from "./RESTManagement.js";
-
+//Le but c'est d'associer un mot clé (les domaines) a une amscotte personnalisée
 const IMAGES = {
     "Sciences": "mascotte-pluridisciplinaire-sciences.svg",
     "Droit": "mascotte-pluridisciplinaire-droit-science-economique.svg",

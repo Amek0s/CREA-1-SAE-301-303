@@ -63,8 +63,7 @@ h1 {
     color: var(--main-color);
     font-family: var(--font-title);
     text-align: center;
-    font-size: clamp(2rem, 5vw, 3rem);
-    margin: 2rem 0 1rem;
+    font-size: 3rem;
     line-height: 1.2;
 }
 

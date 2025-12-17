@@ -1,89 +1,74 @@
 const URL_BASE_API = 'https://la-lab4ce.univ-lemans.fr/masters-stats/api/rest';
 
 /**
- * Récupère les détails d'une formation (Titre, Etablissement, Ville...)
+ * Récupère les infos principales d'une formation via son code IFC
  */
 export async function getFormationDetails(ifc) {
     try {
         const url = `${URL_BASE_API}/formations/${ifc}?full-details=1`;
         const reponse = await fetch(url);
 
-        if (reponse.ok === false) {
+        if (!reponse.ok) {
             throw new Error(`Erreur HTTP : ${reponse.status}`);
         }
 
-        const donnees = await reponse.json();
-        return donnees;
+        return await reponse.json();
 
     } catch (erreur) {
-        console.error("Erreur détails formation :", erreur);
+        console.error("Problème récupération détails :", erreur);
         return null;
     }
 }
 
 /**
- * Récupère la liste des grands domaines (Droit, Sciences, etc.)
+ * Liste des domaines (Droit, Sciences, etc.) pour la page d'accueil
  */
 export async function getSecteursDisciplinaires() {
     try {
-        const url = `${URL_BASE_API}/secteurs-disciplinaires`;
-        const reponse = await fetch(url);
+        const reponse = await fetch(`${URL_BASE_API}/secteurs-disciplinaires`);
+        if (!reponse.ok) return [];
 
-        if (reponse.ok === false) {
-            return [];
-        }
-
-        const donnees = await reponse.json();
-        return donnees;
+        return await reponse.json();
 
     } catch (erreur) {
-        console.error("Erreur récupération secteurs :", erreur);
+        console.error("Erreur chargement secteurs :", erreur);
         return [];
     }
 }
 
 /**
- * Récupère les masters d'un secteur précis
+ * Trouve tous les masters liés à un secteur
  */
 export async function getFormationsBySecteur(sdid) {
     try {
-        const url = `${URL_BASE_API}/formations?sdid=${sdid}&full-details=1`;
-        const reponse = await fetch(url);
-
-        if (reponse.ok === false) {
-            return [];
-        }
+        const reponse = await fetch(`${URL_BASE_API}/formations?sdid=${sdid}&full-details=1`);
+        if (!reponse.ok) return [];
 
         const donnees = await reponse.json();
 
-        // Vérification si c'est un tableau ou un objet
-        if (Array.isArray(donnees) === true) {
+        if (Array.isArray(donnees)) {
             return donnees;
+        } else if (donnees.formations) {
+            return donnees.formations;
         } else {
-            // Si c'est un objet qui contient une liste "formations"
-            if (donnees.formations) {
-                return donnees.formations;
-            } else {
-                return [];
-            }
+            return [];
         }
 
     } catch (erreur) {
-        console.error("Erreur récupération formations du secteur :", erreur);
+        console.error("Erreur liste formations :", erreur);
         return [];
     }
 }
 
 /**
- * Récupère les chiffres (Stats) pour un master.
- * Essaie d'abord le précis, sinon cherche une moyenne globale (fallback).
+ * Cherche les stats (insertion, salaire) pour un master donné.
+ * Si pas de stats précises, on cherche la moyenne de l'établissement.
  */
 export async function getStatsForMaster(ifc, uai, secDiscId) {
     try {
-        // --- 1. Candidatures ---
-        let donneesCandidatures = { candidatures: [] };
+        let resultatsCandidatures = { candidatures: [] };
         
-        const reponseCand = await fetch(`${URL_BASE_API}/stats/search`, {
+        const repCand = await fetch(`${URL_BASE_API}/stats/search`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -95,28 +80,29 @@ export async function getStatsForMaster(ifc, uai, secDiscId) {
             })
         });
 
-        if (reponseCand.ok === true) {
-            donneesCandidatures = await reponseCand.json();
+        if (repCand.ok) {
+            resultatsCandidatures = await repCand.json();
         }
 
-        // --- 2. Insertion Pro (Tentative précise) ---
-        let donneesInsertion = { insertionsPro: [] };
+        //écupérer l'insertion pro spécifique à ce master
+        let resultatsInsertion = { insertionsPro: [] };
+        let source = 'precis'; 
         
-        const filtresPrecis = {
+        const filtres = {
             "etablissementIds": [uai],
-            "moisApresDiplome": 30,
+            "moisApresDiplome": 30, 
             "anneeMin": 2019
         };
 
         if (secDiscId) {
-            filtresPrecis.secteurDisciplinaireIds = [parseInt(secDiscId)];
+            filtres.secteurDisciplinaireIds = [parseInt(secDiscId)];
         }
 
-        const reponseInsertPrecise = await fetch(`${URL_BASE_API}/stats/search`, {
+        const repInsert = await fetch(`${URL_BASE_API}/stats/search`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                "filters": filtresPrecis,
+                "filters": filtres,
                 "harvest": {
                     "typeStats": "insertionsPro",
                     "insertionProDetails": ["general", "salaire", "emplois"]
@@ -124,25 +110,16 @@ export async function getStatsForMaster(ifc, uai, secDiscId) {
             })
         });
 
-        if (reponseInsertPrecise.ok === true) {
-            donneesInsertion = await reponseInsertPrecise.json();
+        if (repInsert.ok) {
+            resultatsInsertion = await repInsert.json();
         }
 
-        let sourceInsertion = 'precis'; 
+        // Si on n'a rien trouvé, on élargit la recherche à tout l'établissement (moyenne), sécurité pcq des fois ça faisait rien
+        const pasDeDonnees = !resultatsInsertion.insertionsPro || resultatsInsertion.insertionsPro.length === 0;
 
-        // --- 3. Mécanisme de secours (Fallback) ---
-        // Si on n'a rien trouvé de précis
-        let insertionVide = false;
-        if (!donneesInsertion.insertionsPro) {
-            insertionVide = true;
-        } else if (donneesInsertion.insertionsPro.length === 0) {
-            insertionVide = true;
-        }
-
-        if (insertionVide === true) {
-            console.warn("⚠️ Données précises manquantes, passage en moyenne établissement.");
+        if (pasDeDonnees) {
             
-            const reponseInsertGlobal = await fetch(`${URL_BASE_API}/stats/search`, {
+            const repGlobal = await fetch(`${URL_BASE_API}/stats/search`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -158,36 +135,24 @@ export async function getStatsForMaster(ifc, uai, secDiscId) {
                 })
             });
 
-            if (reponseInsertGlobal.ok === true) {
-                const donneesFallback = await reponseInsertGlobal.json();
-                
-                // Si on a trouvé des données globales, on les utilise
-                if (donneesFallback.insertionsPro && donneesFallback.insertionsPro.length > 0) {
-                    donneesInsertion = donneesFallback;
-                    sourceInsertion = 'etablissement_global';
+            if (repGlobal.ok) {
+                const dataGlobal = await repGlobal.json();
+                if (dataGlobal.insertionsPro && dataGlobal.insertionsPro.length > 0) {
+                    resultatsInsertion = dataGlobal;
+                    source = 'etablissement_global';
                 }
             }
         }
 
-        // Préparation des résultats finaux
-        let resultCandidatures = [];
-        if (donneesCandidatures.candidatures) {
-            resultCandidatures = donneesCandidatures.candidatures;
-        }
-
-        let resultInsertions = [];
-        if (donneesInsertion.insertionsPro) {
-            resultInsertions = donneesInsertion.insertionsPro;
-        }
-
+        // Retour propre des données pour l'affichage
         return {
-            candidatures: resultCandidatures,
-            insertionsPro: resultInsertions,
-            sourceInsertion: sourceInsertion
+            candidatures: resultatsCandidatures.candidatures || [],
+            insertionsPro: resultatsInsertion.insertionsPro || [],
+            sourceInsertion: source
         };
 
     } catch (e) {
-        console.error("Erreur stats :", e);
+        console.error("Erreur technique stats :", e);
         return { candidatures: [], insertionsPro: [], sourceInsertion: 'erreur' };
     }
 }

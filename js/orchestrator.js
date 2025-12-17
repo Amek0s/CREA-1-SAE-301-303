@@ -4,25 +4,22 @@ import { initGrapheSalaire, updateGrapheSalaire } from "./grapheSalaire.js";
 import { initGrapheEmploi, updateGrapheEmploi } from "./grapheEmploi.js"; 
 import { initGrapheAdmission, updateGrapheAdmission } from "./grapheAdmission.js"; 
 
-// Variables globales pour la carte
+
 let maCarte = null;
 let monMarqueur = null;
 
-// 1. Récupération de l'identifiant (IFC) dans l'URL
 const parametresUrl = new URLSearchParams(window.location.search);
 let CODE_IFC = parametresUrl.get('ifc');
 
-// Si aucun code n'est trouvé, on en met un par défaut pour éviter que le site soit vide
 if (CODE_IFC === null) {
     console.warn("Pas d'IFC dans l'url, utilisation d'un code par défaut.");
     CODE_IFC = '1302436S61PT';
 }
 
-// 2. Fonction pour mettre à jour les textes (Titre, Etablissement, etc.)
 function mettreAJourTextes(details, stats, sourceDonnees) {
-    if (!details) return; // Si pas de détails, on arrête
+    if (!details) return; 
 
-    // -- Titre du Master --
+    //Titre du Master 
     const titreElement = document.getElementById('disci_master');
     if (titreElement) {
         if (details.mention) {
@@ -32,16 +29,15 @@ function mettreAJourTextes(details, stats, sourceDonnees) {
         }
     }
 
-    // -- Parcours --
+    //Parcours 
     const parcoursElement = document.getElementById('parcours');
     if (parcoursElement) {
         parcoursElement.textContent = details.parcours || "Parcours général";
     }
 
-    // -- Nom de l'établissement --
+    //Nom de l'établissement
     const etabElement = document.getElementById('nomEtab');
     if (etabElement) {
-        // On cherche le nom le plus précis possible
         let nom = details.etablissementLibelle;
         if (!nom) {
             nom = details.etablissement;
@@ -52,12 +48,11 @@ function mettreAJourTextes(details, stats, sourceDonnees) {
         etabElement.textContent = nom;
     }
 
-    // -- Alternance --
+    //Alternance
     const altElement = document.getElementById('alternance');
     if (altElement) {
         let texteAlternance = "Non";
         
-        // On regarde si c'est marqué "vrai" ou si le mot "apprentissage" apparait
         if (details.alternance === true) {
             texteAlternance = "Oui";
         } else if (details.modalites && details.modalites.includes('apprentissage')) {
@@ -67,7 +62,7 @@ function mettreAJourTextes(details, stats, sourceDonnees) {
         altElement.textContent = texteAlternance;
     }
 
-    // -- Capacité d'accueil --
+    //Capacité d'accueil
     const colElement = document.getElementById('col');
     if (colElement) {
         let capacite = "N/A";
@@ -81,11 +76,10 @@ function mettreAJourTextes(details, stats, sourceDonnees) {
         colElement.textContent = capacite;
     }
 
-    // -- Avertissement si les données sont des moyennes --
+    
     const titreStats = document.getElementById('stats-title');
     if (titreStats) {
         if (sourceDonnees === 'etablissement_global') {
-            // On ajoute un petit texte pour prévenir l'utilisateur
             titreStats.innerHTML = "QUELQUES CHIFFRES <br><span style='font-size:0.6em;color:var(--text-secondary);'>(Moyenne de l'établissement - Données précises indisponibles)</span>";
         } else {
             titreStats.textContent = "QUELQUES CHIFFRES";
@@ -93,7 +87,7 @@ function mettreAJourTextes(details, stats, sourceDonnees) {
     }
 }
 
-// 3. Fonction Spéciale pour la Carte (Corrigée)
+//fonction de la carte corrigee par gemini
 async function chercherPosition(recherche) {
     try {
         const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(recherche)}&limit=1`;
@@ -128,17 +122,17 @@ async function mettreAJourCarte(details) {
     let ville = details.ville || "";
     let cp = details.codePostal || "";
 
-    // ESSAI 1 : Recherche précise (Nom + Ville + Code Postal)
+    //Recherche précise (Nom + Ville + Code Postal)
     let requete = `${nom} ${ville} ${cp}`.trim();
     let position = await chercherPosition(requete);
 
-    // ESSAI 2 : Si on a rien trouvé, on cherche juste la Ville (Solution de secours)
+    //Si on a rien trouvén cherche juste la ville
     if (position === null && ville !== "") {
         console.log("Adresse précise non trouvée, recherche de la ville uniquement...");
         position = await chercherPosition(ville);
     }
 
-    // Si on a trouvé une position (soit précise, soit ville), on place le marqueur
+    // Si on a trouvé une position on place le marqueur
     if (position !== null) {
         const lat = position.lat;
         const lon = position.lon;
@@ -159,7 +153,7 @@ async function mettreAJourCarte(details) {
 
 // 4. Préparation des données pour les graphiques
 function formaterDonneesPourGraphiques(stats) {
-    // Valeurs par défaut (toutes à 0)
+    // je met toutes les valeurs par defaut à 0
     let resultat = {
         pct_accept_master: 0,
         taux_insert_18m: 0,
@@ -172,7 +166,6 @@ function formaterDonneesPourGraphiques(stats) {
         nb_temps_plein: 0
     };
 
-    // Récupération Candidatures
     if (stats.candidatures && stats.candidatures.length > 0) {
         const info = stats.candidatures[0].general;
         if (info && info.nb > 0) {
@@ -210,16 +203,13 @@ function formaterDonneesPourGraphiques(stats) {
     return resultat;
 }
 
-// 5. Fonction Principale (Main)
 async function main() {
-    // Initialisation des graphiques vides
     initGrapheSalaire(); 
     initGrapheEmploi(); 
     initGrapheAdmission();
 
     console.log(`Démarrage avec le code IFC : ${CODE_IFC}`);
 
-    // Tentative de chargement depuis le cache (mémoire du navigateur)
     let mesDonnees = loadStatsFromCache();
 
     // Si on a des données en cache mais que ce n'est pas le bon Master (IFC différent), on oublie le cache
@@ -234,19 +224,15 @@ async function main() {
         const details = await getFormationDetails(CODE_IFC);
         
         if (details) {
-            // On récupère l'identifiant de l'établissement (UAI)
             let uai = details.etabUai || details.uai;
             
             // On récupère l'identifiant du secteur disciplinaire et on s'assure que c'est un nombre
             let secteurId = details.secDiscId || details.sectDiscId || details.secteurDisciplinaireId;
             if (secteurId) {
-                secteurId = parseInt(secteurId); // Convertit "12" en 12
+                secteurId = parseInt(secteurId);
             }
-
-            // Appel pour avoir les stats
             const lesStats = await getStatsForMaster(CODE_IFC, uai, secteurId);
             
-            // On stocke tout dans un objet propre
             mesDonnees = {
                 ifc: CODE_IFC,
                 details: details,
@@ -254,14 +240,12 @@ async function main() {
                 formatted: formaterDonneesPourGraphiques(lesStats)
             };
             
-            // On sauvegarde pour la prochaine fois
             saveStatsToCache(mesDonnees);
         } else {
             console.error("Impossible de récupérer les détails de la formation");
         }
     }
 
-    // Affichage final sur la page
     if (mesDonnees && mesDonnees.details) {
         mettreAJourTextes(mesDonnees.details, mesDonnees.statsRaw, mesDonnees.statsRaw.sourceInsertion);
         mettreAJourCarte(mesDonnees.details);
@@ -275,5 +259,4 @@ async function main() {
     }
 }
 
-// Lancement au chargement de la page
 document.addEventListener('DOMContentLoaded', main);

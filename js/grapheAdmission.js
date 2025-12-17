@@ -41,7 +41,7 @@ export function initGrapheAdmission() {
         },
         yAxis: {
             type: 'value',
-            max: 100, // Pourcentage donc max 100
+            max: 100,
             axisLabel: {
                 fontFamily: 'Readex Pro',
                 fontSize: 12,

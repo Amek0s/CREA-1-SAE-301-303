@@ -17,7 +17,7 @@ export function initGrapheEmploi() {
         },
         tooltip: {
             trigger: 'item',
-            formatter: '{b}: {c} ({d}%)' // Ajout du pourcentage au survol
+            formatter: '{b}: {c} ({d}%)'
         },
         legend: {
             orient: 'horizontal',
@@ -35,7 +35,7 @@ export function initGrapheEmploi() {
             {
                 name: 'Type d\'emploi',
                 type: 'pie',
-                radius: ['40%', '70%'], // Donut chart pour un look plus moderne
+                radius: ['40%', '70%'],
                 center: ['50%', '45%'],
                 avoidLabelOverlap: true,
                 itemStyle: {
@@ -44,7 +44,7 @@ export function initGrapheEmploi() {
                     borderWidth: 2
                 },
                 label: {
-                    show: false, // On masque les labels sur le graphe pour éviter le chevauchement
+                    show: false, 
                     position: 'center'
                 },
                 emphasis: {
