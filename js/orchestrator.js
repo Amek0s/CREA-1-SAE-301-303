@@ -4,249 +4,276 @@ import { initGrapheSalaire, updateGrapheSalaire } from "./grapheSalaire.js";
 import { initGrapheEmploi, updateGrapheEmploi } from "./grapheEmploi.js"; 
 import { initGrapheAdmission, updateGrapheAdmission } from "./grapheAdmission.js"; 
 
-let map = null;
-let marker = null;
+// Variables globales pour la carte
+let maCarte = null;
+let monMarqueur = null;
 
-// Lecture de l'URL
-const urlParams = new URLSearchParams(window.location.search);
-let IFC_ACTUEL = urlParams.get('ifc');
+// 1. Récupération de l'identifiant (IFC) dans l'URL
+const parametresUrl = new URLSearchParams(window.location.search);
+let CODE_IFC = parametresUrl.get('ifc');
 
-// Valeur par défaut pour tester si pas d'IFC
-if (IFC_ACTUEL === null) {
-    IFC_ACTUEL = '1302436S61PT';
+// Si aucun code n'est trouvé, on en met un par défaut pour éviter que le site soit vide
+if (CODE_IFC === null) {
+    console.warn("Pas d'IFC dans l'url, utilisation d'un code par défaut.");
+    CODE_IFC = '1302436S61PT';
 }
 
-function updateTextElements(details, stats, sourceInsertion) {
-    if (!details) return;
-    
-    // 1. Candidatures
-    let infoCandidature = {};
-    if (stats.candidatures && stats.candidatures.length > 0) {
-        infoCandidature = stats.candidatures[0].general;
-    }
+// 2. Fonction pour mettre à jour les textes (Titre, Etablissement, etc.)
+function mettreAJourTextes(details, stats, sourceDonnees) {
+    if (!details) return; // Si pas de détails, on arrête
 
-    // 2. Textes par défaut
-    let mention = "Information non disponible";
-    if (details.mention) {
-        mention = details.mention;
-    }
-
-    let parcours = "";
-    if (details.parcours) {
-        parcours = details.parcours;
-    }
-
-    let etablissement = "Établissement inconnu";
-    if (details.etablissement) {
-        etablissement = details.etablissement;
-    } else if (details.etablissementLibelle) {
-        etablissement = details.etablissementLibelle;
-    }
-
-    // 3. Mise à jour HTML
-    const elTitre = document.getElementById('disci_master');
-    const elParcours = document.getElementById('parcours');
-    const elEtab = document.getElementById('nomEtab');
-    const elAlt = document.getElementById('alternance');
-    const elCol = document.getElementById('col');
-
-    if (elTitre) elTitre.textContent = "Master " + mention;
-    if (elParcours) elParcours.textContent = parcours;
-    if (elEtab) elEtab.textContent = etablissement;
-    
-    // Alternance
-    let isAlternance = false;
-    if (details.alternance === true) {
-        isAlternance = true;
-    } else if (details.modalites && details.modalites.includes('apprentissage')) {
-        isAlternance = true;
-    }
-
-    if (elAlt) {
-        if (isAlternance === true) {
-            elAlt.textContent = "Oui";
+    // -- Titre du Master --
+    const titreElement = document.getElementById('disci_master');
+    if (titreElement) {
+        if (details.mention) {
+            titreElement.textContent = "Master " + details.mention;
         } else {
-            elAlt.textContent = "Non";
-        }
-    }
-    
-    // Capacité
-    if (elCol) {
-        if (infoCandidature.capacite) {
-            elCol.textContent = infoCandidature.capacite;
-        } else {
-            elCol.textContent = "N/A";
+            titreElement.textContent = "Master inconnu";
         }
     }
 
-    // Avertissement si données estimées
-    const elStatsTitle = document.getElementById('stats-title');
-    if (elStatsTitle) {
-        if (sourceInsertion === 'etablissement_global') {
-            elStatsTitle.innerHTML = "QUELQUES CHIFFRES <br><span style='font-size:0.6em;color:var(--text-secondary);'>(Données estimées : Moyenne établissement)</span>";
+    // -- Parcours --
+    const parcoursElement = document.getElementById('parcours');
+    if (parcoursElement) {
+        parcoursElement.textContent = details.parcours || "Parcours général";
+    }
+
+    // -- Nom de l'établissement --
+    const etabElement = document.getElementById('nomEtab');
+    if (etabElement) {
+        // On cherche le nom le plus précis possible
+        let nom = details.etablissementLibelle;
+        if (!nom) {
+            nom = details.etablissement;
+        }
+        if (!nom) {
+            nom = "Établissement non spécifié";
+        }
+        etabElement.textContent = nom;
+    }
+
+    // -- Alternance --
+    const altElement = document.getElementById('alternance');
+    if (altElement) {
+        let texteAlternance = "Non";
+        
+        // On regarde si c'est marqué "vrai" ou si le mot "apprentissage" apparait
+        if (details.alternance === true) {
+            texteAlternance = "Oui";
+        } else if (details.modalites && details.modalites.includes('apprentissage')) {
+            texteAlternance = "Oui";
+        }
+        
+        altElement.textContent = texteAlternance;
+    }
+
+    // -- Capacité d'accueil --
+    const colElement = document.getElementById('col');
+    if (colElement) {
+        let capacite = "N/A";
+        
+        // On vérifie que les données existent avant de chercher dedans
+        if (stats.candidatures && stats.candidatures.length > 0) {
+            if (stats.candidatures[0].general) {
+                capacite = stats.candidatures[0].general.capacite;
+            }
+        }
+        colElement.textContent = capacite;
+    }
+
+    // -- Avertissement si les données sont des moyennes --
+    const titreStats = document.getElementById('stats-title');
+    if (titreStats) {
+        if (sourceDonnees === 'etablissement_global') {
+            // On ajoute un petit texte pour prévenir l'utilisateur
+            titreStats.innerHTML = "QUELQUES CHIFFRES <br><span style='font-size:0.6em;color:var(--text-secondary);'>(Moyenne de l'établissement - Données précises indisponibles)</span>";
         } else {
-            elStatsTitle.textContent = "QUELQUES CHIFFRES";
+            titreStats.textContent = "QUELQUES CHIFFRES";
         }
     }
 }
 
-async function updateMapOpenSource(details) {
-    if (!details) return;
-    
-    const divMap = document.getElementById('osm-map');
-    if (!divMap) return;
-
-    if (map === null) {
-        map = L.map('osm-map').setView([46.603354, 1.888334], 6); 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-    }
-
-    let nom = "";
-    if (details.etablissement) nom = details.etablissement;
-    else if (details.etablissementLibelle) nom = details.etablissementLibelle;
-
-    let ville = "";
-    if (details.ville) ville = details.ville;
-
-    let cp = "";
-    if (details.codePostal) cp = details.codePostal;
-    
-    const query = `${nom} ${ville} ${cp}`.trim();
-    
-    if (query.length === 0) return;
-
+// 3. Fonction Spéciale pour la Carte (Corrigée)
+async function chercherPosition(recherche) {
     try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(recherche)}&limit=1`;
         const reponse = await fetch(url);
         const resultats = await reponse.json();
-
-        if (resultats && resultats.length > 0) {
-            const premierResultat = resultats[0];
-            const lat = premierResultat.lat;
-            const lon = premierResultat.lon;
-
-            map.setView([lat, lon], 15);
-
-            if (marker) map.removeLayer(marker);
-            marker = L.marker([lat, lon]).addTo(map).bindPopup(`<b>${nom}</b><br>${ville}`).openPopup();
+        
+        if (resultats.length > 0) {
+            return resultats[0]; // On retourne le premier résultat trouvé
+        } else {
+            return null; // Rien trouvé
         }
-    } catch (e) { console.error(e); }
+    } catch (erreur) {
+        console.error("Erreur de recherche GPS :", erreur);
+        return null;
+    }
 }
 
-function formatDataForCharts(stats) {
-    let infoCand = { nb: 0, accept: 0 };
-    if (stats.candidatures && stats.candidatures[0] && stats.candidatures[0].general) {
-        infoCand = stats.candidatures[0].general;
-    }
-    
-    let infoInsert = {};
-    if (stats.insertionsPro && stats.insertionsPro.length > 0) {
-        infoInsert = stats.insertionsPro[0];
-    }
+async function mettreAJourCarte(details) {
+    if (!details) return;
 
-    // Récupération sécurisée des sous-objets
-    let general = {};
-    if (infoInsert.general) general = infoInsert.general;
-
-    let salaire = {};
-    if (infoInsert.salaire) salaire = infoInsert.salaire;
-
-    let emplois = {};
-    if (infoInsert.emplois) emplois = infoInsert.emplois;
-
-    let tauxAdm = 0;
-    if (infoCand.nb > 0) {
-        tauxAdm = (infoCand.accept / infoCand.nb) * 100;
-    }
-    
-    let salaireMensuel = 0;
-    if (salaire.netMedianTempsPlein) {
-        salaireMensuel = salaire.netMedianTempsPlein;
+    // Si la carte n'existe pas encore, on la crée
+    if (maCarte === null) {
+        maCarte = L.map('osm-map').setView([46.603354, 1.888334], 5); // Vue France
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(maCarte);
     }
 
-    let tauxInsertion = 0;
-    if (general.tauxInsertion) tauxInsertion = general.tauxInsertion;
+    // Préparation des informations de recherche
+    let nom = details.etablissementLibelle || details.etablissement || "";
+    let ville = details.ville || "";
+    let cp = details.codePostal || "";
 
-    let tauxEmploi = 0;
-    if (general.tauxEmploi) tauxEmploi = general.tauxEmploi;
+    // ESSAI 1 : Recherche précise (Nom + Ville + Code Postal)
+    let requete = `${nom} ${ville} ${cp}`.trim();
+    let position = await chercherPosition(requete);
 
-    let salaireBrut = 0;
-    if (salaire.brutAnnuelEstime) salaireBrut = salaire.brutAnnuelEstime;
+    // ESSAI 2 : Si on a rien trouvé, on cherche juste la Ville (Solution de secours)
+    if (position === null && ville !== "") {
+        console.log("Adresse précise non trouvée, recherche de la ville uniquement...");
+        position = await chercherPosition(ville);
+    }
 
-    let nbCadres = 0;
-    if (emplois.cadre) nbCadres = emplois.cadre;
+    // Si on a trouvé une position (soit précise, soit ville), on place le marqueur
+    if (position !== null) {
+        const lat = position.lat;
+        const lon = position.lon;
 
-    let nbStable = 0;
-    if (emplois.stable) nbStable = emplois.stable;
+        // On centre la carte
+        maCarte.setView([lat, lon], 14);
 
-    let nbTempsPlein = 0;
-    if (emplois.tempsPlein) nbTempsPlein = emplois.tempsPlein;
+        // Si un marqueur existe déjà, on l'enlève pour mettre le nouveau
+        if (monMarqueur) {
+            maCarte.removeLayer(monMarqueur);
+        }
 
-    return {
-        pct_accept_master: Math.round(tauxAdm),
-        taux_insert_18m: tauxInsertion,
-        taux_emploi_18m: tauxEmploi,
+        monMarqueur = L.marker([lat, lon]).addTo(maCarte)
+            .bindPopup(`<b>${nom}</b><br>${ville}`)
+            .openPopup();
+    }
+}
 
-        salaire_brut: salaireBrut,
-        salaire_median: salaireMensuel * 12, 
-        salaire_net: salaireMensuel * 12,
-
-        nb_cadres: nbCadres,
-        nb_stable: nbStable,
-        nb_temps_plein: nbTempsPlein
+// 4. Préparation des données pour les graphiques
+function formaterDonneesPourGraphiques(stats) {
+    // Valeurs par défaut (toutes à 0)
+    let resultat = {
+        pct_accept_master: 0,
+        taux_insert_18m: 0,
+        taux_emploi_18m: 0,
+        salaire_brut: 0,
+        salaire_median: 0, 
+        salaire_net: 0,
+        nb_cadres: 0,
+        nb_stable: 0,
+        nb_temps_plein: 0
     };
+
+    // Récupération Candidatures
+    if (stats.candidatures && stats.candidatures.length > 0) {
+        const info = stats.candidatures[0].general;
+        if (info && info.nb > 0) {
+            // Calcul du pourcentage : (Admis / Total) * 100
+            resultat.pct_accept_master = Math.round((info.accept / info.nb) * 100);
+        }
+    }
+    
+    // Récupération Insertion Professionnelle
+    if (stats.insertionsPro && stats.insertionsPro.length > 0) {
+        const insertion = stats.insertionsPro[0];
+        
+        // Partie Générale
+        if (insertion.general) {
+            resultat.taux_insert_18m = insertion.general.tauxInsertion || 0;
+            resultat.taux_emploi_18m = insertion.general.tauxEmploi || 0;
+        }
+
+        // Partie Salaire
+        if (insertion.salaire) {
+            const salaireMensuel = insertion.salaire.netMedianTempsPlein || 0;
+            resultat.salaire_brut = insertion.salaire.brutAnnuelEstime || 0;
+            resultat.salaire_median = salaireMensuel * 12; // Annuel
+            resultat.salaire_net = salaireMensuel * 12;    // Annuel
+        }
+
+        // Partie Emplois (Cadre, Stable...)
+        if (insertion.emplois) {
+            resultat.nb_cadres = insertion.emplois.cadre || 0;
+            resultat.nb_stable = insertion.emplois.stable || 0;
+            resultat.nb_temps_plein = insertion.emplois.tempsPlein || 0;
+        }
+    }
+
+    return resultat;
 }
 
+// 5. Fonction Principale (Main)
 async function main() {
+    // Initialisation des graphiques vides
     initGrapheSalaire(); 
     initGrapheEmploi(); 
     initGrapheAdmission();
 
-    console.log(`Code IFC actuel : ${IFC_ACTUEL}`);
+    console.log(`Démarrage avec le code IFC : ${CODE_IFC}`);
 
-    let donneesGlobales = loadStatsFromCache();
+    // Tentative de chargement depuis le cache (mémoire du navigateur)
+    let mesDonnees = loadStatsFromCache();
 
-    if (donneesGlobales) {
-        if (donneesGlobales.ifc !== IFC_ACTUEL) {
-            donneesGlobales = null;
+    // Si on a des données en cache mais que ce n'est pas le bon Master (IFC différent), on oublie le cache
+    if (mesDonnees) {
+        if (mesDonnees.ifc !== CODE_IFC) {
+            mesDonnees = null;
         }
     }
 
-    if (donneesGlobales === null) {
-        const details = await getFormationDetails(IFC_ACTUEL);
+    // Si pas de données, on va les chercher sur l'API
+    if (mesDonnees === null) {
+        const details = await getFormationDetails(CODE_IFC);
         
         if (details) {
-            let uai = details.etabUai;
-            if (!uai) uai = details.uai;
-
-            let secDiscId = details.secDiscId;
-            if (!secDiscId) secDiscId = details.sectDiscId;
-            if (!secDiscId) secDiscId = details.secteurDisciplinaireId;
-
-            const statsBundle = await getStatsForMaster(IFC_ACTUEL, uai, secDiscId);
+            // On récupère l'identifiant de l'établissement (UAI)
+            let uai = details.etabUai || details.uai;
             
-            donneesGlobales = {
-                ifc: IFC_ACTUEL,
-                details: details,
-                statsRaw: statsBundle,
-                formatted: formatDataForCharts(statsBundle)
-            };
+            // On récupère l'identifiant du secteur disciplinaire et on s'assure que c'est un nombre
+            let secteurId = details.secDiscId || details.sectDiscId || details.secteurDisciplinaireId;
+            if (secteurId) {
+                secteurId = parseInt(secteurId); // Convertit "12" en 12
+            }
 
-            saveStatsToCache(donneesGlobales);
+            // Appel pour avoir les stats
+            const lesStats = await getStatsForMaster(CODE_IFC, uai, secteurId);
+            
+            // On stocke tout dans un objet propre
+            mesDonnees = {
+                ifc: CODE_IFC,
+                details: details,
+                statsRaw: lesStats,
+                formatted: formaterDonneesPourGraphiques(lesStats)
+            };
+            
+            // On sauvegarde pour la prochaine fois
+            saveStatsToCache(mesDonnees);
+        } else {
+            console.error("Impossible de récupérer les détails de la formation");
         }
     }
 
-    if (donneesGlobales && donneesGlobales.formatted) {
-        updateTextElements(donneesGlobales.details, donneesGlobales.statsRaw, donneesGlobales.statsRaw.sourceInsertion);
-        updateMapOpenSource(donneesGlobales.details);
+    // Affichage final sur la page
+    if (mesDonnees && mesDonnees.details) {
+        mettreAJourTextes(mesDonnees.details, mesDonnees.statsRaw, mesDonnees.statsRaw.sourceInsertion);
+        mettreAJourCarte(mesDonnees.details);
         
-        updateGrapheSalaire(donneesGlobales.formatted);
-        updateGrapheEmploi(donneesGlobales.formatted);
-        updateGrapheAdmission(donneesGlobales.formatted);
+        updateGrapheSalaire(mesDonnees.formatted);
+        updateGrapheEmploi(mesDonnees.formatted);
+        updateGrapheAdmission(mesDonnees.formatted);
     } else {
-        const title = document.getElementById('disci_master');
-        if(title) title.textContent = "Données indisponibles";
+        const titre = document.getElementById('disci_master');
+        if(titre) titre.textContent = "Données indisponibles (Erreur technique)";
     }
 }
 
+// Lancement au chargement de la page
 document.addEventListener('DOMContentLoaded', main);
