@@ -1,4 +1,3 @@
-/* --- VARIABLES & THEME --- */
 :root {
     --main-color: #E6136A;
     --main-color-hover: #C40D57;
@@ -17,7 +16,6 @@
     --font-title: 'Paytone One', sans-serif;
 }
 
-/* --- RESET & BASE --- */
 * {
     margin: 0;
     padding: 0;
@@ -51,19 +49,17 @@ button {
     font-family: inherit;
 }
 
-/* Accessibilité : Focus visible */
 button:focus-visible,
 a:focus-visible {
     outline: 3px solid var(--text-primary);
     outline-offset: 4px;
 }
 
-/* --- TYPOGRAPHIE --- */
 h1 {
     color: var(--main-color);
     font-family: var(--font-title);
     text-align: center;
-    font-size: 3rem;
+    font-size: 2rem;
     line-height: 1.2;
 }
 
@@ -90,7 +86,6 @@ h4 {
     margin-bottom: 3rem;
 }
 
-/* --- HEADER --- */
 header {
     background: var(--bg-card);
     border-bottom: 2px solid var(--main-color);
@@ -109,9 +104,19 @@ header {
 }
 
 .btn-menu {
-    background: none;
-    border: none;
-    cursor: pointer;
+    background-color: white;
+    border: 3px solid var(--main-color);
+    padding: 1rem;
+    color: var(--main-color);
+    border-radius: 50px;
+    transition: transform 0.3s ease;
+}
+
+.btn-menu:hover {
+    background-color: var(--main-color);
+    color: white;
+    transform: translateY(-2px);
+    transition: ease-in-out 0.3s;
 }
 
 .icone-filtre {
@@ -119,9 +124,6 @@ header {
     height: 32px;
 }
 
-/* --- COMPOSANTS GÉNÉRAUX --- */
-
-/* Bouton style sombre */
 .button-dark {
     background-color: var(--dark-blue);
     color: white;
@@ -133,6 +135,7 @@ header {
     align-items: center;
     box-shadow: 0 4px 15px rgba(15, 23, 42, 0.3);
     border: 2px solid transparent;
+    transition: transform 0.3s ease;
 }
 
 .button-dark:hover {
@@ -146,7 +149,6 @@ header {
     margin-top: 2rem;
 }
 
-/* Titre encadré */
 .title-border {
     border: 3px solid var(--main-color);
     border-radius: var(--radius-m);
@@ -161,7 +163,6 @@ header {
     font-size: 1.5rem;
 }
 
-/* --- PAGE ACCUEIL : INFO GRID --- */
 .etablissement-section {
     max-width: 1000px;
     margin: 0 auto;
@@ -175,12 +176,7 @@ header {
     margin-bottom: 2rem;
 }
 
-@media (min-width: 768px) {
-    .info-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-    }
-}
+
 
 .info-card {
     background-color: var(--main-color);
@@ -194,6 +190,14 @@ header {
     color: white;
     text-align: center;
     height: 100%;
+    transition: transform 0.3s ease;
+
+}
+
+.info-card:hover {
+    transform: scale(103%);
+    transition: ease-in-out 0.3s;
+
 }
 
 .info-icon {
@@ -226,7 +230,6 @@ header {
     font-family: var(--font-primary);
 }
 
-/* --- PAGE ACCUEIL : STATS --- */
 .section-stats {
     position: relative;
     padding: 4rem 1rem;
@@ -260,29 +263,6 @@ header {
     min-height: 350px;
 }
 
-@media (min-width: 900px) {
-    .stat-card {
-        flex-direction: row;
-        align-items: center;
-        padding: 3rem;
-        text-align: left;
-    }
-
-    .stat-card.layout-inverse {
-        flex-direction: row-reverse;
-    }
-
-    .stat-content {
-        flex: 1;
-        text-align: left;
-    }
-
-    .stat-visual {
-        flex: 1.5;
-    }
-}
-
-/* --- PAGE ACCUEIL : MAP OPEN SOURCE --- */
 .location-section {
     max-width: 1200px;
     margin: 0 auto 4rem auto;
@@ -297,16 +277,12 @@ header {
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Style spécifique pour Leaflet */
 #osm-map {
     height: 450px;
-    /* Hauteur obligatoire */
     width: 100%;
     border-radius: var(--radius-m);
     z-index: 1;
 }
-
-/* --- PAGE DISCIPLINES (discipline.html & discipline2.html) --- */
 
 main {
     padding: 0 1rem;
@@ -319,7 +295,6 @@ main {
     margin: 0 auto;
 }
 
-/* Grille pour le choix des disciplines */
 .disciplines-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -327,19 +302,6 @@ main {
     margin-top: 3rem;
 }
 
-@media (min-width: 600px) {
-    .disciplines-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 992px) {
-    .disciplines-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-/* Carte de discipline individuelle */
 .discipline-card {
     background: var(--bg-card);
     border-radius: var(--radius-l);
@@ -351,10 +313,8 @@ main {
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     height: 100%;
-    /* Uniformise la hauteur */
     border: 2px solid transparent;
     cursor: pointer;
-    /* Indique que c'est cliquable */
 }
 
 .discipline-card:hover {
@@ -363,7 +323,6 @@ main {
     box-shadow: 0 15px 40px rgba(230, 19, 106, 0.15);
 }
 
-/* Lien global sur la carte */
 .discipline-link {
     display: block;
     height: 100%;
@@ -392,8 +351,6 @@ main {
     object-fit: contain;
 }
 
-/* --- PAGE DISCIPLINE 2 (Liste des Masters) --- */
-
 .boiteNomMaster {
     display: grid;
     grid-template-columns: 1fr;
@@ -402,13 +359,7 @@ main {
     margin: 2rem auto;
 }
 
-@media (min-width: 768px) {
-    .boiteNomMaster {
-        grid-template-columns: 1fr 1fr;
-    }
-}
 
-/* Style des "boutons" Master */
 .nomMaster {
     background-color: var(--bg-card);
     color: var(--text-primary);
@@ -422,7 +373,6 @@ main {
     cursor: pointer;
     font-size: 1.1rem;
     display: flex;
-    /* Flex pour centrer le texte si multi-lignes */
     align-items: center;
     justify-content: center;
     min-height: 80px;
@@ -435,7 +385,6 @@ main {
     box-shadow: 0 8px 20px rgba(230, 19, 106, 0.2);
 }
 
-/* --- DÉCORATIONS --- */
 .background-wave {
     position: absolute;
     top: 0;
@@ -458,11 +407,6 @@ main {
     display: none;
 }
 
-@media (min-width: 768px) {
-    .chapeau {
-        display: block;
-    }
-
     .stats-mascot {
         position: absolute;
         right: -2rem;
@@ -470,13 +414,16 @@ main {
         width: 7rem;
         display: block;
     }
-}
+
+    .boiteNomMaster {
+        grid-template-columns: 1fr 1fr;
+    }
+
 
 .stats-mascot {
     display: none;
 }
 
-/* --- FOOTER --- */
 footer {
     background-color: white;
     padding: 3rem 1rem;
@@ -507,4 +454,142 @@ footer {
 
 .social-nav a:hover img {
     transform: scale(1.2);
+}
+
+
+.message-info {
+    text-align: center;
+    width: 100%;
+    grid-column: 1/-1;
+}
+
+.btn-retour-container {
+    text-align: center;
+}
+
+.master-card-inner {
+    width: 100%;
+}
+
+.master-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.badge-alternance {
+    font-size: 0.7em;
+    background-color: var(--main-color);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    vertical-align: middle;
+}
+
+.master-etablissement {
+    font-size: 0.85em;
+    font-weight: normal;
+    color: var(--text-secondary);
+    display: block;
+    margin-top: 4px;
+}
+
+.stat-subtitle-small {
+    font-size: 0.6em;
+    color: var(--text-secondary);
+}
+
+.chart-container-center {
+    margin: 0 auto;
+    max-width: 500px;
+}
+
+.chart-min-height {
+    min-height: 300px;
+}
+
+.stat-content-center {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.stat-card-center {
+    justify-content: center;
+    text-align: center;
+    display: block;
+}
+
+#logo-univ {
+    max-height: 120px;
+    width: auto;
+    margin: 0 auto 20px auto;
+    display: block;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+#logo-univ:hover {
+    transform: scale(1.05);
+}
+
+.master-card-inner {
+    display: flex;
+    align-items: center; 
+    gap: 1.5rem;        
+    text-align: left;   
+    width: 100%;
+}
+
+.logo-ecole-liste {
+    width: 90px;    
+    height: 90px;
+    object-fit: contain; 
+    background-color: white;
+    border-radius: 8px;  
+    padding: 2px;
+}
+
+@media (min-width: 768px) {
+    .info-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+        .chapeau {
+        display: block;
+    }
+}
+
+@media (max-width: 600px) {
+    .master-card-inner {
+        flex-direction: column; 
+        text-align: center;
+    }
+}
+
+@media (min-width: 900px) {
+
+        .disciplines-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .stat-card {
+        flex-direction: row;
+        align-items: center;
+        padding: 3rem;
+        text-align: left;
+    }
+
+    .stat-card.layout-inverse {
+        flex-direction: row-reverse;
+    }
+
+    .stat-content {
+        flex: 1;
+        text-align: left;
+    }
+
+    .stat-visual {
+        flex: 1.5;
+    }
 }

@@ -1,6 +1,6 @@
 import { getSecteursDisciplinaires } from "./RESTManagement.js";
-//Le but c'est d'associer un mot clé (les domaines) a une amscotte personnalisée
-const IMAGES = {
+
+const LISTE_IMAGES = {
     "Sciences": "mascotte-pluridisciplinaire-sciences.svg",
     "Droit": "mascotte-pluridisciplinaire-droit-science-economique.svg",
     "Economie": "mascotte-sciences-economique-gestion.svg",
@@ -11,51 +11,47 @@ const IMAGES = {
     "Santé": "mascotte-svt.svg",
     "Théologie": "mascotte-theologie.svg",
     "Informatique": "mascotte-science-fondamentales-application.svg",
-    "Art": "lettre sciences du langage arts.svg",
-    "Défaut": "mascotte-chill.svg"
+    "Art": "lettre sciences du langage arts.svg"
 };
 
-async function init() {
-    const grid = document.querySelector('.disciplines-grid');
-    if (!grid) return;
+const IMAGE_PAR_DEFAUT = "mascotte-chill.svg";
 
-    grid.innerHTML = '<p style="grid-column:1/-1;text-align:center">Chargement des disciplines...</p>';
+async function init() {
+    const grille = document.querySelector('.disciplines-grid');
+    if (!grille) return;
+
+    grille.innerHTML = '<p style="grid-column:1/-1;text-align:center">Chargement des disciplines...</p>';
 
     const secteurs = await getSecteursDisciplinaires();
 
-    if (!secteurs) {
-        grid.innerHTML = '<p style="text-align:center">Impossible de charger les données.</p>';
-        return;
-    }
-    
-    if (secteurs.length === 0) {
-        grid.innerHTML = '<p style="text-align:center">Aucun secteur trouvé.</p>';
+    if (!secteurs || secteurs.length === 0) {
+        grille.innerHTML = '<p style="text-align:center">Aucun secteur trouvé.</p>';
         return;
     }
 
-    // Tri alphabétique
+    // Tri par ordre alphabétique
     secteurs.sort(function(a, b) {
         return a.nom.localeCompare(b.nom);
     });
 
-    grid.innerHTML = '';
+    grille.innerHTML = '';
 
     secteurs.forEach(secteur => {
-        let nomImage = IMAGES["Défaut"];
+        let nomImage = IMAGE_PAR_DEFAUT;
         
-        // Recherche du mot clé
-        for (let motCle in IMAGES) {
-            if (secteur.nom.includes(motCle) === true) {
-                nomImage = IMAGES[motCle];
+        // On cherche si un mot clé est présent dans le nom du secteur
+        for (let motCle in LISTE_IMAGES) {
+            if (secteur.nom.includes(motCle)) {
+                nomImage = LISTE_IMAGES[motCle];
                 break; 
             }
         }
 
-        const link = document.createElement('a');
-        link.href = `discipline2.html?sdid=${secteur.id}&nom=${encodeURIComponent(secteur.nom)}`;
-        link.className = 'discipline-link';
+        const lien = document.createElement('a');
+        lien.href = "discipline2.html?sdid=" + secteur.id + "&nom=" + encodeURIComponent(secteur.nom);
+        lien.className = 'discipline-link';
         
-        link.innerHTML = `
+        lien.innerHTML = `
             <figure class="discipline-card">
                 <img src="./images/${nomImage}" class="discipline-visual" alt="">
                 <figcaption class="discipline-content">
@@ -65,7 +61,7 @@ async function init() {
             </figure>
         `;
         
-        grid.appendChild(link);
+        grille.appendChild(lien);
     });
 }
 

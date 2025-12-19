@@ -1,6 +1,6 @@
-const CLE_STOCKAGE = 'MASTER_STATS_DATA_V7'; 
+const CLE_STOCKAGE = 'MASTER_STATS_DATA'; 
 const DUREE_CACHE = 1000 * 60 * 60; // 1 heure
-const CLE_TEMPS = 'MASTER_STATS_TIME_V7'; 
+const CLE_TEMPS = 'MASTER_STATS_TIME'; 
 
 let monStockage = window.localStorage;
 

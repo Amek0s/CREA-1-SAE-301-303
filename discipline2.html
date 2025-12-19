@@ -1,35 +1,41 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MasterMind - Choisir un Master</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Paytone+One&family=Readex+Pro:wght@160..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Paytone+One&family=Readex+Pro:wght@160..700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css" type="text/css">
     <link rel="icon" href="./images/mascotte-chill.png" type="image/png">
 </head>
+
 <body>
-    <header role="banner">
+    <header>
         <a href="index.html"><img src="./images/logo-v2.svg" class="logo-header" alt="Logo MasterMind"></a>
-        <nav role="navigation" aria-label="Menu principal">
-            <a href="discipline.html" class="btn-menu" aria-label="Retour aux disciplines">
-                <img src="./images/filtre.svg" alt="Retour" class="icone-filtre">
+        <nav aria-label="Menu principal">
+            <a href="discipline.html" class="btn-menu" aria-label="Retour disciplines">
+                Retour vers les disciplines
             </a>
         </nav>
     </header>
 
-    <main role="main">
+    <main>
         <section class="trouver-discipline" aria-labelledby="titre-master">
             <h1 id="titre-master">Choisir mon Master</h1>
+            
             <p class="subtitle" id="subtitle-secteur">Chargement...</p>
 
-            <div class="boiteNomMaster"></div>
+            <div class="boiteNomMaster">
+       
+            </div>
         </section>
     </main>
 
-    <footer role="contentinfo">
+    <footer>
         <div class="footer-content">
             <img src="./images/mascotte-chill.png" alt="Logo MasterMind">
             <p>© 2025 MasterMind</p>
@@ -37,4 +43,5 @@
     </footer>
     <script type="module" src="./js/discipline2.js"></script>
 </body>
+
 </html>

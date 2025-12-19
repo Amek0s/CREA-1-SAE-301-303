@@ -27,7 +27,8 @@ export function initGrapheSalaire() {
         },
         xAxis: {
             type: 'category',
-            data: ['Brut Annuel', 'Médian Annuel', 'Net Annuel'],
+            // On ne garde que 2 catégories
+            data: ['Brut Annuel', 'Net Annuel'],
             axisLabel: {
                 fontFamily: 'Readex Pro',
                 fontWeight: 500,
@@ -57,11 +58,10 @@ export function initGrapheSalaire() {
         series: [
             {
                 type: 'bar',
-                barWidth: '40%',
+                barWidth: '50%', // Barres un peu plus larges vu qu'il n'y en a que 2
                 data: [
-                    { value: 0, itemStyle: { color: '#1BCDF5', borderRadius: [5, 5, 0, 0] } },
-                    { value: 0, itemStyle: { color: '#F5E11B', borderRadius: [5, 5, 0, 0] } },
-                    { value: 0, itemStyle: { color: '#E6136A', borderRadius: [5, 5, 0, 0] } } 
+                    { value: 0, itemStyle: { color: '#1BCDF5', borderRadius: [5, 5, 0, 0] } }, // Bleu pour le Brut
+                    { value: 0, itemStyle: { color: '#E6136A', borderRadius: [5, 5, 0, 0] } }  // Rose pour le Net
                 ],
                 label: {
                     show: true,
@@ -88,7 +88,6 @@ export function updateGrapheSalaire(data) {
 
     const newData = [
         { value: data.salaire_brut || 0, itemStyle: { color: '#1BCDF5', borderRadius: [5, 5, 0, 0] } },
-        { value: data.salaire_median || 0, itemStyle: { color: '#F5E11B', borderRadius: [5, 5, 0, 0] } },
         { value: data.salaire_net || 0, itemStyle: { color: '#E6136A', borderRadius: [5, 5, 0, 0] } }
     ];
 

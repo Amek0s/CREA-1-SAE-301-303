@@ -60,23 +60,21 @@ export async function getFormationsBySecteur(sdid) {
     }
 }
 
-/**
- * Cherche les stats (insertion, salaire) pour un master donné.
- * Si pas de stats précises, on cherche la moyenne de l'établissement.
- */
+
 export async function getStatsForMaster(ifc, uai, secDiscId) {
     try {
         let resultatsCandidatures = { candidatures: [] };
-        
+
         const repCand = await fetch(`${URL_BASE_API}/stats/search`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                "filters": { 
+                "filters": {
                     "formationIfcs": [ifc],
-                    "anneeMin": 2021
+                    "anneeMin": 2018
                 },
-                "harvest": { "typeStats": "candidatures", "candidatureDetails": ["general"] }
+                "harvest": {
+                    "typeStats": "candidatures", "candidatureDetails": ["general", "experience"] }
             })
         });
 
@@ -84,14 +82,14 @@ export async function getStatsForMaster(ifc, uai, secDiscId) {
             resultatsCandidatures = await repCand.json();
         }
 
-        //écupérer l'insertion pro spécifique à ce master
         let resultatsInsertion = { insertionsPro: [] };
-        let source = 'precis'; 
-        
+        let source = 'precis';
+
         const filtres = {
             "etablissementIds": [uai],
-            "moisApresDiplome": 30, 
-            "anneeMin": 2019
+            "formationIfcs": [ifc],
+            "moisApresDiplome": 30,
+            "anneeMin": 2018
         };
 
         if (secDiscId) {
@@ -118,15 +116,15 @@ export async function getStatsForMaster(ifc, uai, secDiscId) {
         const pasDeDonnees = !resultatsInsertion.insertionsPro || resultatsInsertion.insertionsPro.length === 0;
 
         if (pasDeDonnees) {
-            
+
             const repGlobal = await fetch(`${URL_BASE_API}/stats/search`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    "filters": { 
+                    "filters": {
                         "etablissementIds": [uai],
                         "moisApresDiplome": 30,
-                        "anneeMin": 2019
+                        "anneeMin": 2018
                     },
                     "harvest": {
                         "typeStats": "insertionsPro",
