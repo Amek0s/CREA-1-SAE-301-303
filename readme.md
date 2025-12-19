@@ -87,6 +87,5 @@ CREA-1-SAE-301-303/
 
 
 ### TODO
- Faire en srote que le bouton qui renvoie sur le site de l'établissement fonctionne (nécessite de trouver une API avec les sites ?)
- Changer le graphe sur les Types d'emplois -> Incoherence car les contrats de cadre peuvent inclure les emplois stables et a temps plein 
- Implementer le fait que quand on a aps de données on ait "N/A" et pas de 0.
+ Faire en sorte que le bouton qui renvoie sur le site de l'établissement fonctionne (nécessite de trouver une API avec les sites ?)
+ Voir si on garde le graphes sur les types d'emplois
