@@ -1,5 +1,5 @@
 import { getFormationDetails, getStatsForMaster } from "./RESTManagement.js";
-import { saveStatsToCache } from "./cacheManagement.js";
+import { saveStatsToCache, loadStatsFromCache } from "./cacheManagement.js";
 import { initGrapheSalaire, updateGrapheSalaire } from "./grapheSalaire.js";
 import { initGrapheEmploi, updateGrapheEmploi } from "./grapheEmploi.js";
 import { initGrapheAdmission, updateGrapheAdmission } from "./grapheAdmission.js";
@@ -9,7 +9,6 @@ import { initGrapheInsertion, updateGrapheInsertion } from "./grapheInsertion.js
 let maCarte = null;
 let monMarqueur = null;
 
-// Récupération de l'ID dans l'URL
 const parametresUrl = new URLSearchParams(window.location.search);
 let CODE_IFC = parametresUrl.get('ifc');
 
@@ -20,7 +19,6 @@ if (CODE_IFC === null) {
 function mettreAJourTextes(details, stats, sourceDonnees) {
     if (!details) return;
 
-    // Titre et Parcours
     const titreElement = document.getElementById('disci_master');
     if (titreElement) {
         titreElement.textContent = details.mention ? "Master " + details.mention : "Master inconnu";
@@ -31,14 +29,26 @@ function mettreAJourTextes(details, stats, sourceDonnees) {
         parcoursElement.textContent = details.parcours || "Parcours général";
     }
 
-    // Nom de l'établissement
     const etabElement = document.getElementById('nomEtab');
     if (etabElement) {
         let nom = details.etablissementLibelle || details.etablissement || "Établissement non spécifié";
         etabElement.textContent = nom;
     }
 
-    // Logo (API MonMaster)
+    const btnSite = document.getElementById('btn-website');
+    if (btnSite) {
+        if (details.urlWeb) {
+            btnSite.href = details.urlWeb;
+        } else {
+            const nomEtab = details.etablissementLibelle || "";
+            const ville = details.ville || "";
+            const mention = details.mention || "";
+            
+            const recherche = "Université " + nomEtab + " " + ville + " Master " + mention;
+            btnSite.href = "https://www.google.com/search?q=" + encodeURIComponent(recherche);
+        }
+    }
+
     const logUniv = document.getElementById("logo-univ");
     if (logUniv) {
         const uai = details.etabUai || details.uai;
@@ -52,7 +62,6 @@ function mettreAJourTextes(details, stats, sourceDonnees) {
         }
     }
 
-    // Alternance
     const altElement = document.getElementById('alternance');
     if (altElement) {
         let estAlternance = details.alternance === true;
@@ -64,7 +73,6 @@ function mettreAJourTextes(details, stats, sourceDonnees) {
         altElement.textContent = estAlternance ? "Oui" : "Non";
     }
 
-    // Calculs Capacité et Sélectivité
     let capacite = 0;
     let nbCandidats = 0;
 
@@ -101,7 +109,6 @@ function mettreAJourTextes(details, stats, sourceDonnees) {
         }
     }
 
-    // Avertissement si ce sont des stats globales
     const titreStats = document.getElementById('stats-title');
     if (titreStats && sourceDonnees === 'etablissement_global') {
         titreStats.innerHTML = "QUELQUES CHIFFRES <br><span style='font-size:0.6em;color:var(--text-secondary);'>(Moyenne de l'établissement - Données précises indisponibles)</span>";
@@ -122,7 +129,6 @@ async function mettreAJourCarte(details) {
     let ville = details.ville || "";
     let cp = details.codePostal || "";
 
-    // Recherche GPS via Nominatim
     const recherche = nom + " " + ville + " " + cp;
     const url = "https://nominatim.openstreetmap.org/search?format=json&q=" + encodeURIComponent(recherche) + "&limit=1";
 
@@ -135,7 +141,7 @@ async function mettreAJourCarte(details) {
             const lon = resultats[0].lon;
 
             maCarte.setView([lat, lon], 14);
-            
+
             if (monMarqueur) maCarte.removeLayer(monMarqueur);
             monMarqueur = L.marker([lat, lon]).addTo(maCarte)
                 .bindPopup("<b>" + nom + "</b><br>" + ville)
@@ -149,16 +155,14 @@ async function mettreAJourCarte(details) {
 function formaterDonneesPourGraphiques(stats) {
     let resultat = {
         pct_accept_master: 0, taux_boursiers: 0, taux_insert_18m: 0, taux_emploi_18m: 0,
-        salaire_brut: 0, salaire_net: 0, 
+        salaire_brut: 0, salaire_net: 0,
         nb_cadres: 0, nb_stable: 0, nb_temps_plein: 0,
         origine_lg3: 0, origine_lp3: 0, origine_master: 0, origine_autre: 0, origine_non_inscrit: 0
     };
 
-    // Stats Candidatures
     if (stats.candidatures && stats.candidatures.length > 0) {
         const cand = stats.candidatures[0];
-        
-        // Origines
+
         if (cand.experience) {
             if (cand.experience.lg3) resultat.origine_lg3 = cand.experience.lg3.accept;
             if (cand.experience.lp3) resultat.origine_lp3 = cand.experience.lp3.accept;
@@ -167,13 +171,11 @@ function formaterDonneesPourGraphiques(stats) {
             if (cand.experience.noninscrit) resultat.origine_non_inscrit = cand.experience.noninscrit.accept;
         }
 
-        // Taux d'admission
         if (cand.general && cand.general.nb > 0) {
             resultat.pct_accept_master = Math.round((cand.general.accept / cand.general.nb) * 100);
         }
     }
 
-    // Stats Insertion Pro
     if (stats.insertionsPro && stats.insertionsPro.length > 0) {
         const insertion = stats.insertionsPro[0];
 
@@ -186,7 +188,7 @@ function formaterDonneesPourGraphiques(stats) {
             resultat.nb_cadres = insertion.emplois.cadre || 0;
             resultat.nb_stable = insertion.emplois.stable || 0;
             resultat.nb_temps_plein = insertion.emplois.tempsPlein || 0;
-            
+
             if (insertion.emplois.boursier !== undefined) {
                 resultat.taux_boursiers = Math.round(insertion.emplois.boursier);
             }
@@ -209,21 +211,42 @@ async function main() {
     initGrapheOrigine();
     initGrapheInsertion();
 
+    // Vérification du cache
+    const dataCache = loadStatsFromCache();
+    if (dataCache && dataCache.ifc === CODE_IFC) {
+        const { details, stats, formatted } = dataCache;
+
+        mettreAJourTextes(details, stats, stats.sourceInsertion);
+        mettreAJourCarte(details);
+
+        updateGrapheSalaire(formatted);
+        updateGrapheEmploi(formatted);
+        updateGrapheAdmission(formatted);
+        updateGrapheOrigine(formatted);
+        updateGrapheInsertion(formatted.pct_accept_master);
+        return;
+    }
+
+    // Chargement API si pas de cache
     const details = await getFormationDetails(CODE_IFC);
 
     if (details) {
         const uai = details.etabUai || details.uai;
         const secteurId = details.secDiscId || details.secteurDisciplinaireId;
-        
+
         const lesStats = await getStatsForMaster(CODE_IFC, uai, secteurId);
-        
-        // Nettoyage des données
         const donneesPropres = formaterDonneesPourGraphiques(lesStats);
 
-        // Affichage
+        saveStatsToCache({
+            ifc: CODE_IFC,
+            details: details,
+            stats: lesStats,
+            formatted: donneesPropres
+        });
+
         mettreAJourTextes(details, lesStats, lesStats.sourceInsertion);
         mettreAJourCarte(details);
-        
+
         updateGrapheSalaire(donneesPropres);
         updateGrapheEmploi(donneesPropres);
         updateGrapheAdmission(donneesPropres);
